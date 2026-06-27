@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="مدير أعمالي">
+<meta name="theme-color" content="#1a1a2e">
+<title>مدير أعمالي</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+--bg:#0f0f1a;--bg2:#1a1a2e;--bg3:#16213e;--card:#1e1e35;--card2:#252540;
+--accent:#6c63ff;--accent2:#a78bfa;--accent3:#38bdf8;
+--success:#10b981;--warning:#f59e0b;--danger:#ef4444;
+--text:#f0f0ff;--text2:#a0a0c0;--text3:#6060a0;
+--border:#2a2a4a;--radius:16px;--radius-sm:10px;
+}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-height:100vh;overflow-x:hidden}
+/* Header */
+.header{background:var(--bg2);padding:16px 20px 12px;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100}
+.header-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.app-title{font-size:20px;font-weight:700;background:linear-gradient(135deg,var(--accent2),var(--accent3));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.date-badge{font-size:12px;color:var(--text2);background:var(--bg3);padding:4px 10px;border-radius:20px;border:1px solid var(--border)}
+/* Stats bar */
+.stats-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:12px 20px;background:var(--bg2);border-bottom:1px solid var(--border)}
+.stat{text-align:center}
+.stat-num{font-size:22px;font-weight:700}
+.stat-num.total{color:var(--accent2)}
+.stat-num.done{color:var(--success)}
+.stat-num.pending{color:var(--warning)}
+.stat-num.delayed{color:var(--danger)}
+.stat-label{font-size:10px;color:var(--text3);margin-top:2px}
+/* Tabs */
+.tabs{display:flex;gap:6px;padding:12px 20px;background:var(--bg2);border-bottom:1px solid var(--border);overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{padding:7px 14px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--border);color:var(--text2);background:transparent;white-space:nowrap;transition:all .2s}
+.tab.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+/* Content */
+.content{padding:16px 20px;padding-bottom:100px}
+/* Task cards */
+.task-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:10px;transition:all .2s;position:relative;overflow:hidden}
+.task-card::before{content:'';position:absolute;right:0;top:0;bottom:0;width:4px;border-radius:0 var(--radius) var(--radius) 0}
+.task-card.p1::before{background:var(--danger)}
+.task-card.p2::before{background:var(--warning)}
+.task-card.p3::before{background:var(--accent3)}
+.task-card.done-card{opacity:0.5}
+.task-header{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px}
+.task-check{width:22px;height:22px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;margin-top:1px;transition:all .2s}
+.task-check.checked{background:var(--success);border-color:var(--success)}
+.task-check svg{width:12px;height:12px;stroke:#fff;stroke-width:3;fill:none;display:none}
+.task-check.checked svg{display:block}
+.task-name{font-size:15px;font-weight:600;flex:1;line-height:1.4}
+.task-name.done-text{text-decoration:line-through;color:var(--text3)}
+.task-meta{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.meta-pill{display:inline-flex;align-items:center;gap:4px;padding:4px 9px;border-radius:20px;font-size:11px;font-weight:500}
+.pill-p1{background:rgba(239,68,68,.15);color:#fca5a5}
+.pill-p2{background:rgba(245,158,11,.15);color:#fcd34d}
+.pill-p3{background:rgba(56,189,248,.15);color:#7dd3fc}
+.pill-loc{background:rgba(108,99,255,.15);color:var(--accent2)}
+.pill-dur{background:rgba(16,185,129,.15);color:#6ee7b7}
+.pill-type{background:rgba(96,96,160,.2);color:var(--text2)}
+.task-actions{display:flex;gap:8px}
+.action-btn{flex:1;padding:8px;border-radius:var(--radius-sm);border:1px solid var(--border);background:transparent;color:var(--text2);font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;transition:all .2s;font-family:inherit}
+.action-btn:active{transform:scale(.97)}
+.btn-calendar{border-color:rgba(56,189,248,.4);color:var(--accent3)}
+.btn-delay{border-color:rgba(245,158,11,.4);color:var(--warning)}
+.btn-delete{border-color:rgba(239,68,68,.3);color:var(--danger)}
+/* Add button */
+.fab{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,var(--accent),var(--accent3));color:#fff;border:none;border-radius:30px;padding:14px 32px;font-size:16px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:8px;box-shadow:0 4px 24px rgba(108,99,255,.5);font-family:inherit;z-index:99;white-space:nowrap}
+.fab:active{transform:translateX(-50%) scale(.97)}
+/* Modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;display:flex;align-items:flex-end;opacity:0;pointer-events:none;transition:opacity .3s}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.modal{background:var(--bg2);border-radius:24px 24px 0 0;padding:20px;width:100%;max-height:90vh;overflow-y:auto;transform:translateY(100%);transition:transform .3s}
+.modal-overlay.open .modal{transform:translateY(0)}
+.modal-handle{width:40px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 20px}
+.modal-title{font-size:18px;font-weight:700;margin-bottom:20px;text-align:center}
+/* Form */
+.form-group{margin-bottom:16px}
+.form-label{font-size:12px;color:var(--text2);margin-bottom:6px;display:block;font-weight:600}
+.form-input{width:100%;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;color:var(--text);font-size:15px;font-family:inherit;outline:none;transition:border-color .2s}
+.form-input:focus{border-color:var(--accent)}
+.form-input::placeholder{color:var(--text3)}
+.select-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.select-grid.two{grid-template-columns:repeat(2,1fr)}
+.select-option{padding:10px 6px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--card);color:var(--text2);font-size:12px;cursor:pointer;text-align:center;transition:all .2s;font-family:inherit}
+.select-option.selected{border-color:var(--accent);background:rgba(108,99,255,.2);color:var(--accent2)}
+.select-option.sel-p1.selected{border-color:var(--danger);background:rgba(239,68,68,.15);color:#fca5a5}
+.select-option.sel-p2.selected{border-color:var(--warning);background:rgba(245,158,11,.15);color:#fcd34d}
+.select-option.sel-p3.selected{border-color:var(--accent3);background:rgba(56,189,248,.15);color:#7dd3fc}
+.submit-btn{width:100%;background:linear-gradient(135deg,var(--accent),var(--accent3));color:#fff;border:none;border-radius:var(--radius-sm);padding:15px;font-size:16px;font-weight:700;cursor:pointer;margin-top:8px;font-family:inherit}
+.submit-btn:active{opacity:.9}
+/* Delay modal */
+.delay-options{display:flex;flex-direction:column;gap:8px;margin-bottom:16px}
+.delay-option{padding:12px 16px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--card);color:var(--text);font-size:14px;cursor:pointer;text-align:right;font-family:inherit;transition:all .2s}
+.delay-option:active{background:var(--card2)}
+.delay-option.selected{border-color:var(--warning);background:rgba(245,158,11,.1);color:#fcd34d}
+/* Weekly report */
+.report-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px}
+.report-title{font-size:14px;font-weight:700;color:var(--accent2);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.pattern-item{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px}
+.pattern-item:last-child{border-bottom:none}
+.pattern-count{color:var(--warning);font-weight:700}
+.insight-box{background:rgba(108,99,255,.1);border:1px solid rgba(108,99,255,.3);border-radius:var(--radius-sm);padding:12px;margin-top:12px;font-size:13px;color:var(--accent2);line-height:1.6}
+/* Empty state */
+.empty{text-align:center;padding:48px 20px;color:var(--text3)}
+.empty-icon{font-size:48px;margin-bottom:12px}
+.empty-text{font-size:15px;line-height:1.6}
+/* Toast */
+.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%);background:var(--success);color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;font-weight:600;z-index:300;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1}
+.toast.warn{background:var(--warning)}
+/* Progress ring */
+.progress-wrap{display:flex;align-items:center;gap:12px;background:var(--card);border-radius:var(--radius);padding:14px;margin-bottom:16px;border:1px solid var(--border)}
+.ring-wrap{position:relative;width:56px;height:56px;flex-shrink:0}
+.ring-wrap svg{transform:rotate(-90deg)}
+.ring-bg{fill:none;stroke:var(--border);stroke-width:5}
+.ring-fill{fill:none;stroke:var(--accent);stroke-width:5;stroke-linecap:round;transition:stroke-dashoffset .5s}
+.ring-text{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--accent2)}
+.progress-info h3{font-size:15px;font-weight:700;margin-bottom:4px}
+.progress-info p{font-size:12px;color:var(--text2)}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-top">
+    <span class="app-title">⚡ مدير أعمالي</span>
+    <span class="date-badge" id="dateDisplay"></span>
+  </div>
+</div>
+
+<div class="stats-bar">
+  <div class="stat"><div class="stat-num total" id="statTotal">0</div><div class="stat-label">المهام</div></div>
+  <div class="stat"><div class="stat-num done" id="statDone">0</div><div class="stat-label">منجزة</div></div>
+  <div class="stat"><div class="stat-num pending" id="statPending">0</div><div class="stat-label">معلقة</div></div>
+  <div class="stat"><div class="stat-num delayed" id="statDelayed">0</div><div class="stat-label">مؤجلة</div></div>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="setTab('all',this)">الكل</button>
+  <button class="tab" onclick="setTab('today',this)">اليوم ⚡</button>
+  <button class="tab" onclick="setTab('pending',this)">معلقة</button>
+  <button class="tab" onclick="setTab('delayed',this)">مؤجلة</button>
+  <button class="tab" onclick="setTab('done',this)">منجزة</button>
+  <button class="tab" onclick="setTab('report',this)">تقرير أسبوعي</button>
+</div>
+
+<div class="content" id="mainContent"></div>
+
+<button class="fab" onclick="openAddModal()">+ إضافة مهمة</button>
+
+<!-- Add Task Modal -->
+<div class="modal-overlay" id="addModal">
+<div class="modal">
+  <div class="modal-handle"></div>
+  <div class="modal-title">مهمة جديدة</div>
+  <div class="form-group">
+    <label class="form-label">اسم المهمة</label>
+    <input class="form-input" id="taskName" placeholder="مثال: مراجعة العقد مع المحامي" />
+  </div>
+  <div class="form-group">
+    <label class="form-label">درجة الأهمية</label>
+    <div class="select-grid">
+      <button class="select-option sel-p1" onclick="selectOpt(this,'priority','1')">⚡ قصوى<br><span style="font-size:10px;opacity:.7">اليوم</span></button>
+      <button class="select-option sel-p2" onclick="selectOpt(this,'priority','2')">🔶 متوسطة<br><span style="font-size:10px;opacity:.7">أسبوع</span></button>
+      <button class="select-option sel-p3" onclick="selectOpt(this,'priority','3')">🔷 منخفضة<br><span style="font-size:10px;opacity:.7">3 أسابيع</span></button>
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="form-label">الموقع</label>
+    <div class="select-grid">
+      <button class="select-option" onclick="selectOpt(this,'location','مكتب')">🏢 مكتب</button>
+      <button class="select-option" onclick="selectOpt(this,'location','خارجي')">🚗 خارجي</button>
+      <button class="select-option" onclick="selectOpt(this,'location','عن بُعد')">💻 عن بُعد</button>
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="form-label">نوع المهمة</label>
+    <div class="select-grid two">
+      <button class="select-option" onclick="selectOpt(this,'type','تفكير عميق')">🧠 تفكير عميق</button>
+      <button class="select-option" onclick="selectOpt(this,'type','تنفيذي')">⚙️ تنفيذي</button>
+      <button class="select-option" onclick="selectOpt(this,'type','تواصل')">🤝 تواصل</button>
+      <button class="select-option" onclick="selectOpt(this,'type','إداري')">📋 إداري</button>
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="form-label">المدة المتوقعة (دقيقة)</label>
+    <input class="form-input" id="taskDuration" type="number" placeholder="مثال: 60" />
+  </div>
+  <div class="form-group">
+    <label class="form-label">موعد التذكير</label>
+    <input class="form-input" id="taskDate" type="datetime-local" />
+  </div>
+  <button class="submit-btn" onclick="addTask()">إضافة المهمة + تذكير Google Calendar</button>
+  <button style="width:100%;padding:12px;background:transparent;border:none;color:var(--text3);font-size:14px;cursor:pointer;margin-top:8px;font-family:inherit" onclick="closeModal('addModal')">إلغاء</button>
+</div>
+</div>
+
+<!-- Delay Modal -->
+<div class="modal-overlay" id="delayModal">
+<div class="modal">
+  <div class="modal-handle"></div>
+  <div class="modal-title">تأجيل المهمة</div>
+  <div class="form-group">
+    <label class="form-label">نوع التأجيل</label>
+    <div class="select-grid two">
+      <button class="select-option" onclick="selectOpt(this,'delayType','مؤقت')">⏰ مؤقت<br><span style="font-size:10px;opacity:.7">يوم-يومين</span></button>
+      <button class="select-option" onclick="selectOpt(this,'delayType','مفتوح')">📅 مفتوح</button>
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="form-label">سبب التأجيل</label>
+    <div class="delay-options" id="delayReasons">
+      <button class="delay-option" onclick="selectDelay(this,'الوقت لم يكفِ')">1️⃣ الوقت لم يكفِ — انشغلت بمهام أخرى</button>
+      <button class="delay-option" onclick="selectDelay(this,'طارئ خارجي')">2️⃣ طارئ خارج عن الإرادة</button>
+      <button class="delay-option" onclick="selectDelay(this,'ناقص معلومات')">3️⃣ لم أكن مستعداً / ناقص معلومات</button>
+      <button class="delay-option" onclick="selectDelay(this,'أصعب مما توقعت')">4️⃣ المهمة أصعب مما توقعت</button>
+      <button class="delay-option" onclick="selectDelay(this,'تغيّرت الأولويات')">5️⃣ تغيّرت الأولويات</button>
+      <button class="delay-option" onclick="selectDelay(this,'إجهاد / طاقة منخفضة')">6️⃣ إجهاد / انخفاض طاقة</button>
+      <button class="delay-option" onclick="selectDelay(this,'أحتاج شخصاً آخر')">7️⃣ أحتاج شخصاً آخر لإتمامها</button>
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="form-label">ملاحظة اختيارية</label>
+    <input class="form-input" id="delayNote" placeholder="تفاصيل إضافية..." />
+  </div>
+  <div class="form-group">
+    <label class="form-label">الموعد الجديد (اختياري)</label>
+    <input class="form-input" id="delayNewDate" type="datetime-local" />
+  </div>
+  <button class="submit-btn" onclick="confirmDelay()" style="background:linear-gradient(135deg,#f59e0b,#ef4444)">تأكيد التأجيل</button>
+  <button style="width:100%;padding:12px;background:transparent;border:none;color:var(--text3);font-size:14px;cursor:pointer;margin-top:8px;font-family:inherit" onclick="closeModal('delayModal')">إلغاء</button>
+</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// State
+let tasks = JSON.parse(localStorage.getItem('tasks_v3') || '[]');
+let currentTab = 'all';
+let currentForm = {priority:'',location:'',type:'',delayType:'',delayReason:''};
+let delayingTaskId = null;
+
+// Init
+function init(){
+  updateDate();
+  render();
+  setInterval(updateDate, 60000);
+}
+
+function updateDate(){
+  const now = new Date();
+  const days = ['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
+  document.getElementById('dateDisplay').textContent = days[now.getDay()] + ' ' + now.toLocaleDateString('ar-SA');
+}
+
+function save(){
+  localStorage.setItem('tasks_v3', JSON.stringify(tasks));
+}
+
+function genId(){
+  return Date.now().toString(36) + Math.random().toString(36).slice(2);
+}
+
+// Tabs
+function setTab(tab, el){
+  currentTab = tab;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  render();
+}
+
+// Stats
+function updateStats(){
+  const total = tasks.length;
+  const done = tasks.filter(t => t.status === 'done').length;
+  const delayed = tasks.filter(t => t.status === 'delayed').length;
+  const pending = total - done - delayed;
+  document.getElementById('statTotal').textContent = total;
+  document.getElementById('statDone').textContent = done;
+  document.getElementById('statPending').textContent = pending;
+  document.getElementById('statDelayed').textContent = delayed;
+}
+
+// Render
+function render(){
+  updateStats();
+  const content = document.getElementById('mainContent');
+  if(currentTab === 'report'){ renderReport(); return; }
+
+  const today = new Date().toDateString();
+  let filtered = tasks;
+  if(currentTab === 'today') filtered = tasks.filter(t => t.status !== 'done' && t.priority === '1');
+  else if(currentTab === 'pending') filtered = tasks.filter(t => t.status === 'pending');
+  else if(currentTab === 'delayed') filtered = tasks.filter(t => t.status === 'delayed');
+  else if(currentTab === 'done') filtered = tasks.filter(t => t.status === 'done');
+
+  if(filtered.length === 0){
+    content.innerHTML = `<div class="empty"><div class="empty-icon">${currentTab==='done'?'🎉':'📋'}</div><div class="empty-text">${currentTab==='done'?'لا توجد مهام منجزة بعد':'لا توجد مهام في هذا القسم<br>اضغط + لإضافة مهمة جديدة'}</div></div>`;
+    return;
+  }
+
+  // Progress ring for today
+  let html = '';
+  if(currentTab === 'all' || currentTab === 'today'){
+    const total = tasks.length;
+    const done = tasks.filter(t=>t.status==='done').length;
+    const pct = total ? Math.round(done/total*100) : 0;
+    const circ = 2 * Math.PI * 24;
+    const offset = circ - (pct/100)*circ;
+    html += `<div class="progress-wrap">
+      <div class="ring-wrap">
+        <svg width="56" height="56" viewBox="0 0 56 56">
+          <circle class="ring-bg" cx="28" cy="28" r="24"/>
+          <circle class="ring-fill" cx="28" cy="28" r="24" stroke-dasharray="${circ}" stroke-dashoffset="${offset}"/>
+        </svg>
+        <div class="ring-text">${pct}%</div>
+      </div>
+      <div class="progress-info">
+        <h3>تقدم اليوم</h3>
+        <p>${done} منجزة من ${total} مهمة</p>
+      </div>
+    </div>`;
+  }
+
+  filtered.forEach(task => {
+    const isDone = task.status === 'done';
+    const isDelayed = task.status === 'delayed';
+    const pClass = `p${task.priority}`;
+    const pLabel = task.priority==='1'?'⚡ قصوى':task.priority==='2'?'🔶 متوسطة':'🔷 منخفضة';
+    const pPill = task.priority==='1'?'pill-p1':task.priority==='2'?'pill-p2':'pill-p3';
+    const dateStr = task.date ? new Date(task.date).toLocaleString('ar-SA',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}) : '';
+
+    html += `<div class="task-card ${pClass} ${isDone?'done-card':''}">
+      <div class="task-header">
+        <div class="task-check ${isDone?'checked':''}" onclick="toggleDone('${task.id}')">
+          <svg viewBox="0 0 14 14"><polyline points="2,7 6,11 12,3"/></svg>
+        </div>
+        <div class="task-name ${isDone?'done-text':''}">${task.name}</div>
+      </div>
+      <div class="task-meta">
+        <span class="meta-pill ${pPill}">${pLabel}</span>
+        ${task.location?`<span class="meta-pill pill-loc">📍 ${task.location}</span>`:''}
+        ${task.duration?`<span class="meta-pill pill-dur">⏱ ${task.duration} د</span>`:''}
+        ${task.type?`<span class="meta-pill pill-type">${task.type}</span>`:''}
+        ${isDelayed&&task.delayReason?`<span class="meta-pill" style="background:rgba(239,68,68,.15);color:#fca5a5">⏸ ${task.delayReason}</span>`:''}
+        ${dateStr?`<span class="meta-pill" style="background:rgba(56,189,248,.1);color:var(--accent3)">🕐 ${dateStr}</span>`:''}
+      </div>
+      <div class="task-actions">
+        ${task.date?`<button class="action-btn btn-calendar" onclick="addToCalendar('${task.id}')">📅 تقويم</button>`:''}
+        ${!isDone?`<button class="action-btn btn-delay" onclick="openDelayModal('${task.id}')">⏸ تأجيل</button>`:''}
+        <button class="action-btn btn-delete" onclick="deleteTask('${task.id}')">🗑</button>
+      </div>
+    </div>`;
+  });
+
+  content.innerHTML = html;
+}
+
+// Report
+function renderReport(){
+  const total = tasks.length;
+  const done = tasks.filter(t=>t.status==='done').length;
+  const delayed = tasks.filter(t=>t.status==='delayed').length;
+  const pct = total ? Math.round(done/total*100) : 0;
+
+  // Count delay reasons
+  const reasons = {};
+  tasks.filter(t=>t.delayReason).forEach(t=>{
+    reasons[t.delayReason] = (reasons[t.delayReason]||0)+1;
+  });
+
+  // Find dominant pattern
+  let topReason = '', topCount = 0;
+  Object.entries(reasons).forEach(([r,c])=>{ if(c>topCount){topReason=r;topCount=c;} });
+
+  const patterns = {
+    'الوقت لم يكفِ': {diag:'جدولك أثقل من وقتك المتاح', sol:'قلّل المهام اليومية بمهمة واحدة أو مد وقت العمل 30 دقيقة'},
+    'طارئ خارجي': {diag:'الطوارئ تتكرر بشكل يمكن توقعه', sol:'اترك 30-45 دقيقة يومياً احتياطية غير مجدولة'},
+    'ناقص معلومات': {diag:'تضيف مهاماً قبل توفر متطلباتها', sol:'اسأل "ما المطلوب قبل البدء؟" لكل مهمة جديدة'},
+    'أصعب مما توقعت': {diag:'تقدّر وقت المهام بأقل من الواقع باستمرار', sol:'أضف بافر 30% تلقائي على كل مدة تقدّرها'},
+    'تغيّرت الأولويات': {diag:'بيئة عملك ديناميكية جداً', sol:'راجع الجدول كل صباح 5 دقائق'},
+    'إجهاد / طاقة منخفضة': {diag:'أوقات عملك لا تتناسب مع طاقتك الذهنية', sol:'راجع توقيت جلسة العمل اليومية'},
+    'أحتاج شخصاً آخر': {diag:'مهامك مرتبطة بأشخاص أكثر مما تظن', sol:'حدد التبعيات مسبقاً عند إضافة كل مهمة'},
+  };
+
+  const pat = patterns[topReason] || null;
+
+  let html = `<div class="report-card">
+    <div class="report-title">📊 ملخص الأسبوع</div>
+    <div class="pattern-item"><span>إجمالي المهام</span><span class="pattern-count">${total}</span></div>
+    <div class="pattern-item"><span>منجزة</span><span style="color:var(--success);font-weight:700">${done}</span></div>
+    <div class="pattern-item"><span>مؤجلة</span><span style="color:var(--danger);font-weight:700">${delayed}</span></div>
+    <div class="pattern-item"><span>معدل الإنجاز</span><span style="color:var(--accent2);font-weight:700">${pct}%</span></div>
+  </div>`;
+
+  if(Object.keys(reasons).length > 0){
+    html += `<div class="report-card">
+      <div class="report-title">⏸ أسباب التأجيل</div>`;
+    Object.entries(reasons).sort((a,b)=>b[1]-a[1]).forEach(([r,c])=>{
+      html += `<div class="pattern-item"><span>${r}</span><span class="pattern-count">${c} مرات</span></div>`;
+    });
+    if(pat){
+      html += `<div class="insight-box">🔍 <strong>التشخيص:</strong> ${pat.diag}<br><br>✅ <strong>التوصية:</strong> ${pat.sol}</div>`;
+    }
+    html += `</div>`;
+  }
+
+  if(total === 0){
+    html = `<div class="empty"><div class="empty-icon">📊</div><div class="empty-text">أضف مهام أولاً لتظهر التقارير</div></div>`;
+  }
+
+  document.getElementById('mainContent').innerHTML = html;
+}
+
+// Modal
+function openAddModal(){
+  currentForm = {priority:'',location:'',type:'',delayType:'',delayReason:''};
+  document.getElementById('taskName').value = '';
+  document.getElementById('taskDuration').value = '';
+  const now = new Date(); now.setMinutes(0,0,0);
+  now.setHours(now.getHours()+1);
+  document.getElementById('taskDate').value = now.toISOString().slice(0,16);
+  document.querySelectorAll('.select-option').forEach(o=>o.classList.remove('selected'));
+  document.getElementById('addModal').classList.add('open');
+}
+
+function closeModal(id){
+  document.getElementById(id).classList.remove('open');
+}
+
+function selectOpt(el, field, val){
+  const parent = el.parentElement;
+  parent.querySelectorAll('.select-option').forEach(o=>o.classList.remove('selected'));
+  el.classList.add('selected');
+  currentForm[field] = val;
+}
+
+function selectDelay(el, val){
+  document.querySelectorAll('.delay-option').forEach(o=>o.classList.remove('selected'));
+  el.classList.add('selected');
+  currentForm.delayReason = val;
+}
+
+// Add task
+function addTask(){
+  const name = document.getElementById('taskName').value.trim();
+  if(!name){ showToast('اكتب اسم المهمة أولاً','warn'); return; }
+  if(!currentForm.priority){ showToast('اختر درجة الأهمية','warn'); return; }
+
+  const task = {
+    id: genId(),
+    name,
+    priority: currentForm.priority,
+    location: currentForm.location,
+    type: currentForm.type,
+    duration: document.getElementById('taskDuration').value,
+    date: document.getElementById('taskDate').value,
+    status: 'pending',
+    delayReason: '',
+    delayNote: '',
+    createdAt: new Date().toISOString()
+  };
+
+  tasks.unshift(task);
+  save();
+  closeModal('addModal');
+
+  // Suggest calendar
+  if(task.date){
+    setTimeout(()=>{ addToCalendar(task.id); }, 400);
+  }
+
+  showToast('تمت إضافة المهمة ✓');
+  
+  // Suggestion
+  const suggestions = {
+    'تواصل': '💡 هل تريد إضافة مهمة تحضيرية قبله؟',
+    'تفكير عميق': '💡 حدد المخرج المتوقع من هذه الجلسة',
+  };
+  if(suggestions[task.type]){
+    setTimeout(()=>showToast(suggestions[task.type],'warn'), 2000);
+  }
+
+  render();
+}
+
+// Calendar
+function addToCalendar(id){
+  const task = tasks.find(t=>t.id===id);
+  if(!task||!task.date){ showToast('حدد موعداً أولاً','warn'); return; }
+
+  const start = new Date(task.date);
+  const end = new Date(start.getTime() + (task.duration||60)*60000);
+
+  const fmt = d => d.toISOString().replace(/[-:]/g,'').slice(0,15)+'Z';
+  const details = `مهمة: ${task.name}\nالأهمية: ${task.priority==='1'?'قصوى':task.priority==='2'?'متوسطة':'منخفضة'}\nالموقع: ${task.location||'-'}\nالمدة: ${task.duration||60} دقيقة`;
+
+  const url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent('📋 '+task.name)}&dates=${fmt(start)}/${fmt(end)}&details=${encodeURIComponent(details)}&location=${encodeURIComponent(task.location||'')}`;
+
+  window.open(url,'_blank');
+  showToast('تم فتح Google Calendar ✓');
+}
+
+// Toggle done
+function toggleDone(id){
+  const task = tasks.find(t=>t.id===id);
+  if(!task) return;
+  task.status = task.status==='done' ? 'pending' : 'done';
+  save(); render();
+  if(task.status==='done') showToast('أحسنت! مهمة منجزة ✓');
+}
+
+// Delete
+function deleteTask(id){
+  tasks = tasks.filter(t=>t.id!==id);
+  save(); render();
+  showToast('تم الحذف');
+}
+
+// Delay
+function openDelayModal(id){
+  delayingTaskId = id;
+  currentForm.delayType = '';
+  currentForm.delayReason = '';
+  document.getElementById('delayNote').value = '';
+  document.getElementById('delayNewDate').value = '';
+  document.querySelectorAll('.delay-option').forEach(o=>o.classList.remove('selected'));
+  document.querySelectorAll('#delayModal .select-option').forEach(o=>o.classList.remove('selected'));
+  document.getElementById('delayModal').classList.add('open');
+}
+
+function confirmDelay(){
+  if(!currentForm.delayReason){ showToast('اختر سبب التأجيل','warn'); return; }
+  const task = tasks.find(t=>t.id===delayingTaskId);
+  if(!task) return;
+  task.status = 'delayed';
+  task.delayReason = currentForm.delayReason;
+  task.delayType = currentForm.delayType;
+  task.delayNote = document.getElementById('delayNote').value;
+  const newDate = document.getElementById('delayNewDate').value;
+  if(newDate) task.date = newDate;
+  save();
+  closeModal('delayModal');
+
+  if(task.priority==='1') showToast('⚠️ تنبيه: مهمة قصوى مؤجلة!','warn');
+  else showToast('تم تأجيل المهمة');
+  render();
+}
+
+// Toast
+function showToast(msg, type=''){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (type==='warn'?' warn':'');
+  setTimeout(()=>t.className='toast', 3000);
+}
+
+// Close on overlay click
+document.querySelectorAll('.modal-overlay').forEach(overlay=>{
+  overlay.addEventListener('click', e=>{
+    if(e.target===overlay) overlay.classList.remove('open');
+  });
+});
+
+init();
+</script>
+</body>
+</html>
