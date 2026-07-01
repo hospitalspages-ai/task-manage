@@ -3,739 +3,1469 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="مدير أعمالي">
-<meta name="theme-color" content="#1a1a2e">
-<title>مدير أعمالي</title>
+<title>نظام حياتي | Personal Life &amp; Business OS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&family=Almarai:wght@400;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 <style>
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+/* ============================================================
+   TOKENS — Luxury Dark Slate
+============================================================ */
 :root{
---bg:#0f0f1a;--bg2:#1a1a2e;--bg3:#16213e;--card:#1e1e35;--card2:#252540;
---accent:#6c63ff;--accent2:#a78bfa;--accent3:#38bdf8;
---success:#10b981;--warning:#f59e0b;--danger:#ef4444;
---text:#f0f0ff;--text2:#a0a0c0;--text3:#6060a0;
---border:#2a2a4a;--radius:16px;--radius-sm:10px;
+  --bg:#05050a; --bg2:#0d0d1a; --card:#121226; --accent:#6c63ff;
+  --accent-soft: rgba(108,99,255,.14);
+  --success:#10b981; --success-soft: rgba(16,185,129,.14);
+  --warning:#f59e0b; --warning-soft: rgba(245,158,11,.14);
+  --danger:#ef4444; --danger-soft: rgba(239,68,68,.14);
+  --text:#f5f5fa; --text-dim:#9a9ab0; --text-faint:#5c5c74;
+  --border:#1f1f3d;
+  --radius:18px; --radius-sm:12px;
+  --shadow: 0 20px 60px -20px rgba(0,0,0,.6);
+  --axis-business:#6c63ff; --axis-health:#10b981; --axis-faith:#f59e0b;
 }
-body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-height:100vh;overflow-x:hidden}
-.header{background:var(--bg2);padding:16px 20px 12px;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100}
-.header-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
-.app-title{font-size:20px;font-weight:700;background:linear-gradient(135deg,var(--accent2),var(--accent3));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.date-badge{font-size:12px;color:var(--text2);background:var(--bg3);padding:4px 10px;border-radius:20px;border:1px solid var(--border)}
-.sync-indicator{font-size:11px;padding:3px 10px;border-radius:20px;border:1px solid var(--border);display:flex;align-items:center;gap:4px}
-.sync-dot{width:6px;height:6px;border-radius:50%;background:var(--success)}
-.sync-dot.syncing{background:var(--warning);animation:pulse 1s infinite}
-.sync-dot.error{background:var(--danger)}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
-.stats-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:12px 20px;background:var(--bg2);border-bottom:1px solid var(--border)}
-.stat{text-align:center}
-.stat-num{font-size:22px;font-weight:700}
-.stat-num.total{color:var(--accent2)}
-.stat-num.done{color:var(--success)}
-.stat-num.pending{color:var(--warning)}
-.stat-num.delayed{color:var(--danger)}
-.stat-label{font-size:10px;color:var(--text3);margin-top:2px}
-.tabs{display:flex;gap:6px;padding:12px 20px;background:var(--bg2);border-bottom:1px solid var(--border);overflow-x:auto;scrollbar-width:none}
-.tabs::-webkit-scrollbar{display:none}
-.tab{padding:7px 14px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--border);color:var(--text2);background:transparent;white-space:nowrap;transition:all .2s}
-.tab.active{background:var(--accent);color:#fff;border-color:var(--accent)}
-.content{padding:16px 20px;padding-bottom:100px}
-.task-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:10px;transition:all .2s;position:relative;overflow:hidden}
-.task-card::before{content:'';position:absolute;right:0;top:0;bottom:0;width:4px;border-radius:0 var(--radius) var(--radius) 0}
-.task-card.p1::before{background:var(--danger)}
-.task-card.p2::before{background:var(--warning)}
-.task-card.p3::before{background:var(--accent3)}
-.task-card.done-card{opacity:0.5}
-.task-header{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px}
-.task-check{width:22px;height:22px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;margin-top:1px;transition:all .2s}
-.task-check.checked{background:var(--success);border-color:var(--success)}
-.task-check svg{width:12px;height:12px;stroke:#fff;stroke-width:3;fill:none;display:none}
-.task-check.checked svg{display:block}
-.task-name{font-size:15px;font-weight:600;flex:1;line-height:1.4}
-.task-name.done-text{text-decoration:line-through;color:var(--text3)}
-.task-meta{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
-.meta-pill{display:inline-flex;align-items:center;gap:4px;padding:4px 9px;border-radius:20px;font-size:11px;font-weight:500}
-.pill-p1{background:rgba(239,68,68,.15);color:#fca5a5}
-.pill-p2{background:rgba(245,158,11,.15);color:#fcd34d}
-.pill-p3{background:rgba(56,189,248,.15);color:#7dd3fc}
-.pill-loc{background:rgba(108,99,255,.15);color:var(--accent2)}
-.pill-dur{background:rgba(16,185,129,.15);color:#6ee7b7}
-.pill-type{background:rgba(96,96,160,.2);color:var(--text2)}
-.task-actions{display:flex;gap:8px;flex-wrap:wrap}
-.action-btn{flex:1;min-width:60px;padding:8px;border-radius:var(--radius-sm);border:1px solid var(--border);background:transparent;color:var(--text2);font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;transition:all .2s;font-family:inherit}
-.action-btn:active{transform:scale(.97)}
-.btn-calendar{border-color:rgba(56,189,248,.4);color:var(--accent3)}
-.btn-delay{border-color:rgba(245,158,11,.4);color:var(--warning)}
-.btn-bell{border-color:rgba(108,99,255,.4);color:var(--accent2)}
-.btn-delete{border-color:rgba(239,68,68,.3);color:var(--danger)}
-.fab{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,var(--accent),var(--accent3));color:#fff;border:none;border-radius:30px;padding:14px 32px;font-size:16px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:8px;box-shadow:0 4px 24px rgba(108,99,255,.5);font-family:inherit;z-index:99;white-space:nowrap}
-.fab:active{transform:translateX(-50%) scale(.97)}
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;display:flex;align-items:flex-end;opacity:0;pointer-events:none;transition:opacity .3s}
-.modal-overlay.open{opacity:1;pointer-events:all}
-.modal{background:var(--bg2);border-radius:24px 24px 0 0;padding:20px;width:100%;max-height:90vh;overflow-y:auto;transform:translateY(100%);transition:transform .3s}
-.modal-overlay.open .modal{transform:translateY(0)}
-.modal-handle{width:40px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 20px}
-.modal-title{font-size:18px;font-weight:700;margin-bottom:20px;text-align:center}
-.form-group{margin-bottom:16px}
-.form-label{font-size:12px;color:var(--text2);margin-bottom:6px;display:block;font-weight:600}
-.form-input{width:100%;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;color:var(--text);font-size:15px;font-family:inherit;outline:none;transition:border-color .2s}
-.form-input:focus{border-color:var(--accent)}
-.form-input::placeholder{color:var(--text3)}
-.select-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.select-grid.two{grid-template-columns:repeat(2,1fr)}
-.select-option{padding:10px 6px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--card);color:var(--text2);font-size:12px;cursor:pointer;text-align:center;transition:all .2s;font-family:inherit}
-.select-option.selected{border-color:var(--accent);background:rgba(108,99,255,.2);color:var(--accent2)}
-.select-option.sel-p1.selected{border-color:var(--danger);background:rgba(239,68,68,.15);color:#fca5a5}
-.select-option.sel-p2.selected{border-color:var(--warning);background:rgba(245,158,11,.15);color:#fcd34d}
-.select-option.sel-p3.selected{border-color:var(--accent3);background:rgba(56,189,248,.15);color:#7dd3fc}
-.submit-btn{width:100%;background:linear-gradient(135deg,var(--accent),var(--accent3));color:#fff;border:none;border-radius:var(--radius-sm);padding:15px;font-size:16px;font-weight:700;cursor:pointer;margin-top:8px;font-family:inherit}
-.cancel-btn{width:100%;padding:12px;background:transparent;border:none;color:var(--text3);font-size:14px;cursor:pointer;margin-top:8px;font-family:inherit}
-.delay-option{padding:12px 16px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--card);color:var(--text);font-size:14px;cursor:pointer;text-align:right;font-family:inherit;transition:all .2s;width:100%;margin-bottom:8px}
-.delay-option.selected{border-color:var(--warning);background:rgba(245,158,11,.1);color:#fcd34d}
-.report-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px}
-.report-title{font-size:14px;font-weight:700;color:var(--accent2);margin-bottom:12px}
-.pattern-item{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px}
-.pattern-item:last-child{border-bottom:none}
-.pattern-count{color:var(--warning);font-weight:700}
-.insight-box{background:rgba(108,99,255,.1);border:1px solid rgba(108,99,255,.3);border-radius:var(--radius-sm);padding:12px;margin-top:12px;font-size:13px;color:var(--accent2);line-height:1.6}
-.empty{text-align:center;padding:48px 20px;color:var(--text3)}
-.empty-icon{font-size:48px;margin-bottom:12px}
-.empty-text{font-size:15px;line-height:1.6}
-.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%);background:var(--success);color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;font-weight:600;z-index:300;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap}
-.toast.show{opacity:1}
-.toast.warn{background:var(--warning)}
-.toast.error{background:var(--danger)}
-.progress-wrap{display:flex;align-items:center;gap:12px;background:var(--card);border-radius:var(--radius);padding:14px;margin-bottom:16px;border:1px solid var(--border)}
-.ring-wrap{position:relative;width:56px;height:56px;flex-shrink:0}
-.ring-wrap svg{transform:rotate(-90deg)}
-.ring-bg{fill:none;stroke:var(--border);stroke-width:5}
-.ring-fill{fill:none;stroke:var(--accent);stroke-width:5;stroke-linecap:round;transition:stroke-dashoffset .5s}
-.ring-text{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--accent2)}
-.progress-info h3{font-size:15px;font-weight:700;margin-bottom:4px}
-.progress-info p{font-size:12px;color:var(--text2)}
-.loading{text-align:center;padding:40px;color:var(--text3);font-size:14px}
+*{box-sizing:border-box; margin:0; padding:0;}
+html,body{height:100%;}
+body{
+  background:
+    radial-gradient(1200px 600px at 85% -10%, rgba(108,99,255,.10), transparent 60%),
+    radial-gradient(900px 500px at -10% 110%, rgba(16,185,129,.08), transparent 60%),
+    var(--bg);
+  color:var(--text);
+  font-family:'Tajawal', sans-serif;
+  min-height:100vh;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,.brand,.stat-num{font-family:'Almarai','Tajawal',sans-serif;}
+::selection{background:var(--accent); color:#fff;}
+::-webkit-scrollbar{width:8px; height:8px;}
+::-webkit-scrollbar-thumb{background:var(--border); border-radius:10px;}
+::-webkit-scrollbar-track{background:transparent;}
+a{color:inherit;}
+button{font-family:inherit; cursor:pointer;}
+input,select,textarea{font-family:inherit;}
+:focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
+
+/* ============================================================
+   LAYOUT SHELL
+============================================================ */
+.app-shell{display:flex; min-height:100vh;}
+
+.sidebar{
+  width:260px; flex-shrink:0; background:var(--bg2);
+  border-left:1px solid var(--border);
+  padding:28px 20px; display:flex; flex-direction:column; gap:28px;
+  position:sticky; top:0; height:100vh;
+}
+.brand{display:flex; align-items:center; gap:12px; padding:0 4px;}
+.brand-mark{
+  width:40px; height:40px; border-radius:12px;
+  background:linear-gradient(135deg, var(--accent), #4338ca);
+  display:flex; align-items:center; justify-content:center;
+  font-size:20px; box-shadow:0 8px 20px -6px rgba(108,99,255,.6);
+}
+.brand-text{font-size:17px; font-weight:800; line-height:1.15;}
+.brand-sub{font-size:11px; color:var(--text-faint); font-weight:400; letter-spacing:.3px;}
+
+.nav-group{display:flex; flex-direction:column; gap:4px;}
+.nav-label{font-size:11px; color:var(--text-faint); font-weight:700; letter-spacing:1px; text-transform:uppercase; padding:0 12px; margin-bottom:6px;}
+.nav-item{
+  display:flex; align-items:center; gap:12px; padding:11px 12px; border-radius:12px;
+  color:var(--text-dim); font-size:14.5px; font-weight:500; background:transparent; border:none; width:100%; text-align:right;
+  transition:.15s ease;
+}
+.nav-item .dot{width:8px; height:8px; border-radius:50%; background:var(--text-faint); flex-shrink:0; transition:.15s;}
+.nav-item:hover{background:rgba(255,255,255,.03); color:var(--text);}
+.nav-item.active{background:var(--accent-soft); color:var(--text);}
+.nav-item.active .dot{background:var(--accent); box-shadow:0 0 0 4px rgba(108,99,255,.18);}
+.nav-item[data-axis="Health"].active .dot{background:var(--success); box-shadow:0 0 0 4px rgba(16,185,129,.18);}
+.nav-item[data-axis="Faith"].active .dot{background:var(--warning); box-shadow:0 0 0 4px rgba(245,158,11,.18);}
+
+.sidebar-foot{margin-top:auto; display:flex; flex-direction:column; gap:10px;}
+.sync-pill{
+  display:flex; align-items:center; gap:8px; font-size:11.5px; color:var(--text-faint);
+  padding:9px 12px; border:1px solid var(--border); border-radius:10px; background:rgba(255,255,255,.015);
+}
+.sync-pill .led{width:7px; height:7px; border-radius:50%; background:var(--text-faint);}
+.sync-pill.online .led{background:var(--success); box-shadow:0 0 8px var(--success);}
+.sync-pill.offline .led{background:var(--danger); box-shadow:0 0 8px var(--danger);}
+
+.main{flex:1; min-width:0; padding:30px 36px 80px; max-width:1180px; margin:0 auto; width:100%;}
+
+.topbar{display:flex; align-items:flex-end; justify-content:space-between; gap:16px; margin-bottom:26px; flex-wrap:wrap;}
+.topbar h1{font-size:23px; font-weight:800;}
+.topbar .date-sub{color:var(--text-dim); font-size:13px; margin-top:4px; font-weight:400;}
+.btn{
+  display:inline-flex; align-items:center; gap:8px; border:none; border-radius:12px;
+  padding:11px 18px; font-size:14px; font-weight:700; transition:.15s ease; white-space:nowrap;
+}
+.btn-primary{background:linear-gradient(135deg, var(--accent), #5750d6); color:#fff; box-shadow:0 10px 24px -8px rgba(108,99,255,.55);}
+.btn-primary:hover{transform:translateY(-1px); box-shadow:0 14px 28px -8px rgba(108,99,255,.7);}
+.btn-ghost{background:rgba(255,255,255,.04); color:var(--text); border:1px solid var(--border);}
+.btn-ghost:hover{background:rgba(255,255,255,.08);}
+.btn-danger{background:var(--danger-soft); color:#fca5a5;}
+.btn-sm{padding:8px 12px; font-size:12.5px; border-radius:9px;}
+
+/* Stat cards */
+.stat-row{display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:14px; margin-bottom:28px;}
+.stat-card{
+  background:var(--card); border:1px solid var(--border); border-radius:var(--radius);
+  padding:18px 20px; position:relative; overflow:hidden;
+}
+.stat-card::before{content:''; position:absolute; inset-inline-start:0; top:0; bottom:0; width:3px; background:var(--accent-line, var(--accent));}
+.stat-card.business{--accent-line:var(--axis-business);}
+.stat-card.health{--accent-line:var(--axis-health);}
+.stat-card.faith{--accent-line:var(--axis-faith);}
+.stat-label{font-size:12px; color:var(--text-dim); font-weight:500; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;}
+.stat-num{font-size:26px; font-weight:800;}
+.stat-bar{height:5px; border-radius:4px; background:rgba(255,255,255,.06); margin-top:12px; overflow:hidden;}
+.stat-bar > div{height:100%; border-radius:4px; background:var(--accent-line, var(--accent)); transition:width .5s ease;}
+
+/* Filter chips */
+.filters{display:flex; gap:8px; margin-bottom:18px; flex-wrap:wrap;}
+.chip{
+  padding:8px 16px; border-radius:999px; font-size:13px; font-weight:600;
+  background:rgba(255,255,255,.04); color:var(--text-dim); border:1px solid var(--border); transition:.15s;
+}
+.chip:hover{background:rgba(255,255,255,.07);}
+.chip.active{background:var(--accent); color:#fff; border-color:var(--accent);}
+.chip.active[data-chip="Health"]{background:var(--success);}
+.chip.active[data-chip="Faith"]{background:var(--warning);}
+
+/* Task list */
+.task-list{display:flex; flex-direction:column; gap:10px;}
+.task-card{
+  background:var(--card); border:1px solid var(--border); border-radius:var(--radius-sm);
+  padding:16px 18px; display:flex; align-items:center; gap:16px; position:relative;
+  border-inline-start:3px solid var(--axis-color, var(--accent));
+  transition:.15s ease;
+}
+.task-card:hover{border-color:rgba(255,255,255,.14); transform:translateY(-1px);}
+.task-card.status-delayed{opacity:.72;}
+.task-card.status-conflict{}
+.task-time{
+  display:flex; flex-direction:column; align-items:center; min-width:64px; text-align:center;
+  padding-inline-end:14px; border-inline-end:1px solid var(--border);
+}
+.task-time .t-start{font-size:15px; font-weight:800;}
+.task-time .t-dur{font-size:10.5px; color:var(--text-faint); margin-top:2px;}
+.task-body{flex:1; min-width:0;}
+.task-name{font-size:15px; font-weight:700; display:flex; align-items:center; gap:8px; flex-wrap:wrap;}
+.badge{font-size:10.5px; font-weight:700; padding:3px 9px; border-radius:999px; white-space:nowrap;}
+.badge-axis-Business{background:var(--accent-soft); color:#a8a2ff;}
+.badge-axis-Health{background:var(--success-soft); color:#6ee7b7;}
+.badge-axis-Faith{background:var(--warning-soft); color:#fcd34d;}
+.badge-priority-Max{background:var(--danger-soft); color:#fca5a5;}
+.badge-priority-Medium{background:var(--warning-soft); color:#fcd34d;}
+.badge-priority-Normal{background:rgba(255,255,255,.06); color:var(--text-dim);}
+.badge-status{background:rgba(255,255,255,.06); color:var(--text-dim);}
+.task-meta{display:flex; gap:14px; flex-wrap:wrap; margin-top:6px; font-size:12px; color:var(--text-dim);}
+.task-meta span{display:flex; align-items:center; gap:5px;}
+.task-actions{display:flex; gap:8px; flex-shrink:0;}
+.icon-btn{
+  width:34px; height:34px; border-radius:10px; background:rgba(255,255,255,.04); border:1px solid var(--border);
+  display:flex; align-items:center; justify-content:center; font-size:14px; color:var(--text-dim); transition:.15s;
+}
+.icon-btn:hover{background:rgba(255,255,255,.09); color:var(--text);}
+.icon-btn.danger:hover{background:var(--danger-soft); color:#fca5a5;}
+
+.empty-state{
+  text-align:center; padding:60px 20px; color:var(--text-faint);
+  border:1px dashed var(--border); border-radius:var(--radius);
+}
+.empty-state .e-icon{font-size:34px; margin-bottom:10px;}
+.empty-state .e-title{color:var(--text-dim); font-weight:700; font-size:15px; margin-bottom:4px;}
+
+/* ============================================================
+   MODALS
+============================================================ */
+.overlay{
+  position:fixed; inset:0; background:rgba(2,2,6,.72); backdrop-filter:blur(6px);
+  display:none; align-items:center; justify-content:center; z-index:200; padding:20px;
+}
+.overlay.show{display:flex;}
+.overlay.locked{background:rgba(2,2,6,.86);}
+.modal{
+  background:var(--bg2); border:1px solid var(--border); border-radius:20px;
+  width:100%; max-width:520px; max-height:88vh; overflow-y:auto; box-shadow:var(--shadow);
+  animation:modalIn .22s cubic-bezier(.2,.9,.3,1);
+}
+.modal.wide{max-width:640px;}
+@keyframes modalIn{from{opacity:0; transform:translateY(14px) scale(.98);} to{opacity:1; transform:translateY(0) scale(1);}}
+.modal-head{
+  display:flex; align-items:center; justify-content:space-between; padding:20px 22px;
+  border-bottom:1px solid var(--border); position:sticky; top:0; background:var(--bg2); z-index:2;
+}
+.modal-head h3{font-size:16.5px; font-weight:800;}
+.modal-close{width:30px; height:30px; border-radius:9px; background:rgba(255,255,255,.05); border:none; color:var(--text-dim); font-size:15px;}
+.modal-close:hover{background:rgba(255,255,255,.1); color:var(--text);}
+.modal-body{padding:22px;}
+.modal-foot{display:flex; gap:10px; padding:18px 22px; border-top:1px solid var(--border); position:sticky; bottom:0; background:var(--bg2);}
+.modal-foot .btn{flex:1; justify-content:center;}
+
+.form-row{margin-bottom:16px;}
+.form-row label{display:block; font-size:12.5px; font-weight:600; color:var(--text-dim); margin-bottom:7px;}
+.form-row input[type=text], .form-row input[type=number], .form-row input[type=datetime-local],
+.form-row select, .form-row textarea{
+  width:100%; background:rgba(255,255,255,.03); border:1px solid var(--border); color:var(--text);
+  padding:11px 13px; border-radius:11px; font-size:13.5px; transition:.15s;
+}
+.form-row input:focus, .form-row select:focus, .form-row textarea:focus{
+  border-color:var(--accent); background:rgba(108,99,255,.05);
+}
+.form-row textarea{resize:vertical; min-height:64px;}
+.form-grid{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
+.axis-select{display:flex; gap:8px;}
+.axis-opt{
+  flex:1; text-align:center; padding:12px 8px; border-radius:12px; border:1px solid var(--border);
+  background:rgba(255,255,255,.02); font-size:12.5px; font-weight:700; color:var(--text-dim); transition:.15s;
+}
+.axis-opt .a-ico{display:block; font-size:17px; margin-bottom:5px;}
+.axis-opt.sel[data-axis="Business"]{border-color:var(--axis-business); background:var(--accent-soft); color:var(--text);}
+.axis-opt.sel[data-axis="Health"]{border-color:var(--axis-health); background:var(--success-soft); color:var(--text);}
+.axis-opt.sel[data-axis="Faith"]{border-color:var(--axis-faith); background:var(--warning-soft); color:var(--text);}
+.readonly-field{
+  background:rgba(255,255,255,.02); border:1px dashed var(--border); border-radius:11px; padding:11px 13px;
+  font-size:13.5px; color:var(--text-dim); display:flex; justify-content:space-between;
+}
+.hint{font-size:11.5px; color:var(--text-faint); margin-top:6px;}
+.divider-label{
+  display:flex; align-items:center; gap:10px; font-size:11.5px; font-weight:700; color:var(--text-faint);
+  text-transform:uppercase; letter-spacing:.6px; margin:22px 0 14px;
+}
+.divider-label::after{content:''; flex:1; height:1px; background:var(--border);}
+
+/* Ingredient rows */
+.ing-row{display:grid; grid-template-columns:1fr 110px 38px; gap:8px; margin-bottom:9px; align-items:center;}
+.ing-remove{width:38px; height:38px; border-radius:10px; background:var(--danger-soft); color:#fca5a5; border:none; font-size:15px;}
+.add-ing-btn{
+  width:100%; padding:10px; border-radius:11px; border:1px dashed var(--border); background:transparent;
+  color:var(--accent); font-size:13px; font-weight:700; margin-top:4px;
+}
+.add-ing-btn:hover{background:var(--accent-soft);}
+
+/* Delay reasons */
+.reason-grid{display:grid; grid-template-columns:1fr 1fr; gap:9px; margin-bottom:14px;}
+.reason-opt{
+  padding:11px 10px; text-align:center; border-radius:11px; border:1px solid var(--border);
+  background:rgba(255,255,255,.02); font-size:12.5px; font-weight:600; color:var(--text-dim);
+}
+.reason-opt.sel{border-color:var(--accent); background:var(--accent-soft); color:var(--text);}
+
+/* Evaluation modal */
+.eval-question{margin-bottom:18px;}
+.eval-q-text{font-size:14.5px; font-weight:700; margin-bottom:12px; text-align:center;}
+.yn-row{display:flex; gap:10px;}
+.yn-btn{
+  flex:1; padding:13px; border-radius:12px; border:1px solid var(--border); background:rgba(255,255,255,.02);
+  font-size:14px; font-weight:700; color:var(--text-dim);
+}
+.yn-btn.sel-yes{background:var(--success-soft); border-color:var(--success); color:#6ee7b7;}
+.yn-btn.sel-no{background:var(--danger-soft); border-color:var(--danger); color:#fca5a5;}
+.slider-wrap{padding:6px 4px;}
+.slider-val{text-align:center; font-size:30px; font-weight:900; color:var(--accent); margin-bottom:8px;}
+input[type=range]{
+  width:100%; height:6px; border-radius:4px; -webkit-appearance:none; background:rgba(255,255,255,.08); outline:none;
+}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none; width:22px; height:22px; border-radius:50%; background:var(--accent);
+  box-shadow:0 4px 14px -2px rgba(108,99,255,.7); border:3px solid #fff2; cursor:pointer;
+}
+.task-context-banner{
+  background:rgba(255,255,255,.03); border:1px solid var(--border); border-radius:13px; padding:14px 16px;
+  margin-bottom:20px; text-align:center;
+}
+.task-context-banner .tc-name{font-size:15.5px; font-weight:800; margin-bottom:3px;}
+.task-context-banner .tc-time{font-size:12px; color:var(--text-faint);}
+
+/* Reports tab */
+.report-section{margin-bottom:30px;}
+.report-section h2{font-size:15px; font-weight:800; margin-bottom:16px; display:flex; align-items:center; gap:8px;}
+.axis-bar-row{display:flex; align-items:center; gap:14px; margin-bottom:16px;}
+.axis-bar-label{width:130px; font-size:13px; font-weight:700; display:flex; align-items:center; gap:8px; flex-shrink:0;}
+.axis-bar-label .lbl-dot{width:9px; height:9px; border-radius:50%;}
+.axis-bar-track{flex:1; height:12px; background:rgba(255,255,255,.05); border-radius:8px; overflow:hidden;}
+.axis-bar-fill{height:100%; border-radius:8px; transition:width .6s ease;}
+.axis-bar-pct{width:46px; text-align:left; font-size:13px; font-weight:800; flex-shrink:0;}
+.chart-card{background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:20px; height:320px;}
+
+/* toast / conflict alert */
+.toast-stack{position:fixed; bottom:24px; left:24px; z-index:400; display:flex; flex-direction:column; gap:10px;}
+.toast{
+  background:var(--bg2); border:1px solid var(--border); border-radius:14px; padding:14px 18px; min-width:260px;
+  box-shadow:var(--shadow); display:flex; gap:12px; align-items:flex-start; animation:modalIn .2s ease;
+}
+.toast .t-ico{font-size:18px;}
+.toast .t-title{font-size:13.5px; font-weight:700; margin-bottom:2px;}
+.toast .t-msg{font-size:12px; color:var(--text-dim);}
+.toast.danger{border-color:rgba(239,68,68,.4);}
+.toast.success{border-color:rgba(16,185,129,.4);}
+
+.fab-add{
+  position:fixed; bottom:28px; inset-inline-end:28px; width:58px; height:58px; border-radius:50%;
+  background:linear-gradient(135deg, var(--accent), #5750d6); color:#fff; font-size:26px; border:none;
+  box-shadow:0 14px 30px -8px rgba(108,99,255,.65); display:flex; align-items:center; justify-content:center;
+  z-index:150; display:none;
+}
+.fab-add.show{display:flex;}
+
+@media (max-width:900px){
+  .sidebar{position:fixed; inset-inline-start:0; top:0; bottom:0; z-index:250; transform:translateX(105%); transition:.25s;}
+  html[dir="rtl"] .sidebar{transform:translateX(105%);}
+  .sidebar.open{transform:translateX(0);}
+  .main{padding:20px 16px 100px;}
+  .mobile-menu-btn{display:flex !important;}
+  .form-grid{grid-template-columns:1fr;}
+  .reason-grid{grid-template-columns:1fr;}
+}
+.mobile-menu-btn{display:none; width:40px; height:40px; border-radius:11px; background:var(--card); border:1px solid var(--border); color:var(--text); font-size:17px; align-items:center; justify-content:center;}
+
+@media (prefers-reduced-motion: reduce){
+  *{animation:none !important; transition:none !important;}
+}
 </style>
 </head>
 <body>
+<div class="app-shell">
 
-<div class="header">
-  <div class="header-top">
-    <span class="app-title">⚡ مدير أعمالي</span>
-    <div style="display:flex;gap:8px;align-items:center">
-      <div class="sync-indicator" id="syncIndicator">
-        <div class="sync-dot" id="syncDot"></div>
-        <span id="syncText">متصل</span>
+  <!-- ============================================================
+       SIDEBAR
+  ============================================================ -->
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="brand-mark">◆</div>
+      <div>
+        <div class="brand-text">نظام حياتي</div>
+        <div class="brand-sub">Personal Life &amp; Business OS</div>
       </div>
-      <span class="date-badge" id="dateDisplay"></span>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-label">المحاور</div>
+      <button class="nav-item active" data-view="dashboard" data-axis="all" onclick="setView('dashboard','all')">
+        <span class="dot"></span> نظرة عامة
+      </button>
+      <button class="nav-item" data-view="dashboard" data-axis="Business" onclick="setView('dashboard','Business')">
+        <span class="dot"></span> إدارة الأعمال اليومية
+      </button>
+      <button class="nav-item" data-view="dashboard" data-axis="Health" onclick="setView('dashboard','Health')">
+        <span class="dot"></span> إدارة الصحة
+      </button>
+      <button class="nav-item" data-view="dashboard" data-axis="Faith" onclick="setView('dashboard','Faith')">
+        <span class="dot"></span> إدارة العبادة
+      </button>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-label">التحليل</div>
+      <button class="nav-item" data-view="reports" onclick="setView('reports')">
+        <span class="dot"></span> التقارير وتحليل الخلل
+      </button>
+    </div>
+
+    <div class="sidebar-foot">
+      <div class="sync-pill offline" id="syncPill"><span class="led"></span> <span id="syncText">جارِ الاتصال بقاعدة البيانات...</span></div>
+      <button class="btn btn-ghost" style="width:100%; justify-content:center;" onclick="openTaskModal()">+ إضافة مهمة جديدة</button>
+    </div>
+  </aside>
+
+  <!-- ============================================================
+       MAIN
+  ============================================================ -->
+  <main class="main">
+    <div class="topbar">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <button class="mobile-menu-btn" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
+        <div>
+          <h1 id="pageTitle">نظرة عامة</h1>
+          <div class="date-sub" id="pageDate">—</div>
+        </div>
+      </div>
+      <button class="btn btn-primary" onclick="openTaskModal()">＋ إضافة مهمة</button>
+    </div>
+
+    <!-- DASHBOARD VIEW -->
+    <div id="view-dashboard">
+      <div class="stat-row" id="statRow"></div>
+
+      <div class="filters" id="quickFilters">
+        <button class="chip active" data-chip="today" onclick="setDayFilter('today')">اليوم</button>
+        <button class="chip" data-chip="upcoming" onclick="setDayFilter('upcoming')">القادمة</button>
+        <button class="chip" data-chip="all" onclick="setDayFilter('all')">الكل</button>
+      </div>
+
+      <div class="task-list" id="taskList"></div>
+    </div>
+
+    <!-- REPORTS VIEW -->
+    <div id="view-reports" style="display:none;">
+      <div class="report-section">
+        <h2>📊 توزيع الالتزام حسب المحور</h2>
+        <div id="axisBreakdown"></div>
+      </div>
+      <div class="report-section">
+        <h2>📈 اتجاه الالتزام الأسبوعي</h2>
+        <div class="chart-card"><canvas id="weeklyChart"></canvas></div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<button class="fab-add" onclick="openTaskModal()">＋</button>
+
+<!-- ============================================================
+     ADD / EDIT TASK MODAL
+============================================================ -->
+<div class="overlay" id="taskOverlay">
+  <div class="modal wide">
+    <div class="modal-head">
+      <h3 id="taskModalTitle">إضافة مهمة جديدة</h3>
+      <button class="modal-close" onclick="closeModal('taskOverlay')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="f_id">
+
+      <div class="form-row">
+        <label>المحور</label>
+        <div class="axis-select" id="axisSelect">
+          <button type="button" class="axis-opt sel" data-axis="Business" onclick="chooseAxis('Business')"><span class="a-ico">💼</span>الأعمال</button>
+          <button type="button" class="axis-opt" data-axis="Health" onclick="chooseAxis('Health')"><span class="a-ico">🥗</span>الصحة</button>
+          <button type="button" class="axis-opt" data-axis="Faith" onclick="chooseAxis('Faith')"><span class="a-ico">🕌</span>العبادة</button>
+        </div>
+      </div>
+
+      <!-- STANDARD (Business / Faith) FIELDS -->
+      <div id="standardFields">
+        <div class="form-row">
+          <label>اسم المهمة</label>
+          <input type="text" id="f_name" placeholder="مثال: اجتماع فريق التسويق">
+        </div>
+      </div>
+
+      <!-- HEALTH-SPECIFIC FIELDS -->
+      <div id="healthFields" style="display:none;">
+        <div class="form-row">
+          <label>نوع الوجبة / المشروب</label>
+          <select id="f_mealtype">
+            <option value="فطور">فطور</option>
+            <option value="غداء">غداء</option>
+            <option value="عشاء">عشاء</option>
+            <option value="سناك">سناك</option>
+            <option value="مشروب">مشروب</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label>مكونات الوجبة</label>
+          <div id="ingredientRows"></div>
+          <button type="button" class="add-ing-btn" onclick="addIngredientRow()">+ إضافة مكوّن آخر</button>
+        </div>
+      </div>
+
+      <div class="divider-label">التوقيت والجدولة</div>
+      <div class="form-grid">
+        <div class="form-row">
+          <label>وقت البدء</label>
+          <input type="datetime-local" id="f_start" onchange="recalcEndTime()">
+        </div>
+        <div class="form-row">
+          <label>المدة (بالدقائق)</label>
+          <input type="number" id="f_duration" min="5" step="5" value="30" oninput="recalcEndTime()">
+        </div>
+      </div>
+      <div class="form-row">
+        <label>وقت الانتهاء (محسوب تلقائياً)</label>
+        <div class="readonly-field"><span id="f_end_display">—</span><span>⏱</span></div>
+      </div>
+      <div class="form-row">
+        <label>التكرار</label>
+        <select id="f_recurrence">
+          <option value="Once">مرة واحدة</option>
+          <option value="Daily">يومي</option>
+          <option value="Weekly">أسبوعي</option>
+        </select>
+      </div>
+
+      <!-- FIELDS HIDDEN FOR HEALTH -->
+      <div id="nonHealthFields">
+        <div class="divider-label">تفاصيل إضافية</div>
+        <div class="form-grid">
+          <div class="form-row">
+            <label>الأولوية</label>
+            <select id="f_priority">
+              <option value="Max">أقصى أولوية</option>
+              <option value="Medium" selected>متوسطة</option>
+              <option value="Normal">عادية</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label>الموقع</label>
+            <select id="f_location">
+              <option value="Office">المكتب</option>
+              <option value="Remote">عن بُعد</option>
+              <option value="External">خارجي</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <label>الحالة الذهنية</label>
+          <select id="f_mode">
+            <option value="Deep Focus">تركيز عميق</option>
+            <option value="Execution">تنفيذ</option>
+            <option value="Communication">تواصل</option>
+            <option value="Administrative">إداري</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <label>ملاحظات</label>
+        <textarea id="f_notes" placeholder="أي تفاصيل إضافية..."></textarea>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal('taskOverlay')">إلغاء</button>
+      <button class="btn btn-primary" onclick="submitTask()">حفظ المهمة</button>
     </div>
   </div>
 </div>
 
-<div class="stats-bar">
-  <div class="stat"><div class="stat-num total" id="statTotal">0</div><div class="stat-label">المهام</div></div>
-  <div class="stat"><div class="stat-num done" id="statDone">0</div><div class="stat-label">منجزة</div></div>
-  <div class="stat"><div class="stat-num pending" id="statPending">0</div><div class="stat-label">معلقة</div></div>
-  <div class="stat"><div class="stat-num delayed" id="statDelayed">0</div><div class="stat-label">مؤجلة</div></div>
-</div>
-
-<div class="tabs">
-  <button class="tab active" onclick="setTab('all',this)">الكل</button>
-  <button class="tab" onclick="setTab('today',this)">اليوم ⚡</button>
-  <button class="tab" onclick="setTab('pending',this)">معلقة</button>
-  <button class="tab" onclick="setTab('delayed',this)">مؤجلة</button>
-  <button class="tab" onclick="setTab('done',this)">منجزة</button>
-  <button class="tab" onclick="setTab('report',this)">📊 تقرير</button>
-</div>
-
-<div class="content" id="mainContent"><div class="loading">⏳ جاري التحميل...</div></div>
-
-<button class="fab" onclick="openAddModal()">+ إضافة مهمة</button>
-
-<!-- Add Modal -->
-<div class="modal-overlay" id="addModal">
-<div class="modal">
-  <div class="modal-handle"></div>
-  <div class="modal-title">مهمة جديدة</div>
-  <div class="form-group">
-    <label class="form-label">اسم المهمة</label>
-    <input class="form-input" id="taskName" placeholder="مثال: مراجعة العقد مع المحامي" />
-  </div>
-  <div class="form-group">
-    <label class="form-label">درجة الأهمية</label>
-    <div class="select-grid">
-      <button class="select-option sel-p1" onclick="selectOpt(this,'priority','1')">⚡ قصوى<br><span style="font-size:10px;opacity:.7">اليوم</span></button>
-      <button class="select-option sel-p2" onclick="selectOpt(this,'priority','2')">🔶 متوسطة<br><span style="font-size:10px;opacity:.7">أسبوع</span></button>
-      <button class="select-option sel-p3" onclick="selectOpt(this,'priority','3')">🔷 منخفضة<br><span style="font-size:10px;opacity:.7">3 أسابيع</span></button>
+<!-- ============================================================
+     CONFLICT ALERT MODAL
+============================================================ -->
+<div class="overlay" id="conflictOverlay">
+  <div class="modal" style="max-width:420px;">
+    <div class="modal-head">
+      <h3>⚠️ تعارض في الجدول</h3>
+      <button class="modal-close" onclick="closeModal('conflictOverlay')">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:14px; line-height:1.9; color:var(--text-dim);">
+        لا يمكن حفظ هذه المهمة لأن وقتها يتعارض مع مهمة قائمة بالفعل:
+      </p>
+      <div class="task-context-banner" style="margin-top:14px;">
+        <div class="tc-name" id="conflictTaskName">—</div>
+        <div class="tc-time" id="conflictTaskTime">—</div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-primary" style="width:100%;" onclick="closeModal('conflictOverlay')">فهمت، سأعدّل الوقت</button>
     </div>
   </div>
-  <div class="form-group">
-    <label class="form-label">الموقع</label>
-    <div class="select-grid">
-      <button class="select-option" onclick="selectOpt(this,'location','مكتب')">🏢 مكتب</button>
-      <button class="select-option" onclick="selectOpt(this,'location','خارجي')">🚗 خارجي</button>
-      <button class="select-option" onclick="selectOpt(this,'location','عن بُعد')">💻 عن بُعد</button>
-    </div>
-  </div>
-  <div class="form-group">
-    <label class="form-label">نوع المهمة</label>
-    <div class="select-grid two">
-      <button class="select-option" onclick="selectOpt(this,'type','تفكير عميق')">🧠 تفكير عميق</button>
-      <button class="select-option" onclick="selectOpt(this,'type','تنفيذي')">⚙️ تنفيذي</button>
-      <button class="select-option" onclick="selectOpt(this,'type','تواصل')">🤝 تواصل</button>
-      <button class="select-option" onclick="selectOpt(this,'type','إداري')">📋 إداري</button>
-    </div>
-  </div>
-  <div class="form-group">
-    <label class="form-label">المدة المتوقعة (دقيقة)</label>
-    <input class="form-input" id="taskDuration" type="number" placeholder="مثال: 60" />
-  </div>
-  <div class="form-group">
-    <label class="form-label">موعد التذكير</label>
-    <input class="form-input" id="taskDate" type="datetime-local" />
-  </div>
-  <button class="submit-btn" onclick="addTask()">➕ إضافة المهمة</button>
-  <button class="cancel-btn" onclick="closeModal('addModal')">إلغاء</button>
-</div>
 </div>
 
-<!-- Delay Modal -->
-<div class="modal-overlay" id="delayModal">
-<div class="modal">
-  <div class="modal-handle"></div>
-  <div class="modal-title">تأجيل المهمة</div>
-  <div class="form-group">
-    <label class="form-label">نوع التأجيل</label>
-    <div class="select-grid two">
-      <button class="select-option" onclick="selectOpt(this,'delayType','مؤقت')">⏰ مؤقت</button>
-      <button class="select-option" onclick="selectOpt(this,'delayType','مفتوح')">📅 مفتوح</button>
+<!-- ============================================================
+     DELAY MODAL
+============================================================ -->
+<div class="overlay" id="delayOverlay">
+  <div class="modal" style="max-width:440px;">
+    <div class="modal-head">
+      <h3>⏳ تأجيل المهمة</h3>
+      <button class="modal-close" onclick="closeModal('delayOverlay')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="task-context-banner">
+        <div class="tc-name" id="delayTaskName">—</div>
+        <div class="tc-time" id="delayTaskTime">—</div>
+      </div>
+      <div class="form-row">
+        <label>سبب التأجيل</label>
+        <div class="reason-grid" id="delayReasons">
+          <button type="button" class="reason-opt" data-r="الوقت لم يكفِ" onclick="chooseReason(this)">الوقت لم يكفِ</button>
+          <button type="button" class="reason-opt" data-r="طارئ خارجي" onclick="chooseReason(this)">طارئ خارجي</button>
+          <button type="button" class="reason-opt" data-r="طاقة منخفضة" onclick="chooseReason(this)">طاقة منخفضة</button>
+          <button type="button" class="reason-opt" data-r="أولوية أخرى" onclick="chooseReason(this)">أولوية أخرى</button>
+        </div>
+      </div>
+      <div class="form-row">
+        <label>ملاحظة (اختياري)</label>
+        <textarea id="delayNote" placeholder="اكتب سبباً مخصصاً هنا..."></textarea>
+      </div>
+      <div class="form-row">
+        <label>الوقت الجديد</label>
+        <input type="datetime-local" id="delayNewTime">
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal('delayOverlay')">إلغاء</button>
+      <button class="btn btn-primary" onclick="submitDelay()">تأكيد التأجيل</button>
     </div>
   </div>
-  <div class="form-group">
-    <label class="form-label">سبب التأجيل</label>
-    <button class="delay-option" onclick="selectDelay(this,'الوقت لم يكفِ')">1️⃣ الوقت لم يكفِ</button>
-    <button class="delay-option" onclick="selectDelay(this,'طارئ خارجي')">2️⃣ طارئ خارج عن الإرادة</button>
-    <button class="delay-option" onclick="selectDelay(this,'ناقص معلومات')">3️⃣ لم أكن مستعداً</button>
-    <button class="delay-option" onclick="selectDelay(this,'أصعب مما توقعت')">4️⃣ أصعب مما توقعت</button>
-    <button class="delay-option" onclick="selectDelay(this,'تغيّرت الأولويات')">5️⃣ تغيّرت الأولويات</button>
-    <button class="delay-option" onclick="selectDelay(this,'إجهاد / طاقة منخفضة')">6️⃣ إجهاد / طاقة منخفضة</button>
-    <button class="delay-option" onclick="selectDelay(this,'أحتاج شخصاً آخر')">7️⃣ أحتاج شخصاً آخر</button>
-  </div>
-  <div class="form-group">
-    <label class="form-label">ملاحظة اختيارية</label>
-    <input class="form-input" id="delayNote" placeholder="تفاصيل إضافية..." />
-  </div>
-  <div class="form-group">
-    <label class="form-label">الموعد الجديد</label>
-    <input class="form-input" id="delayNewDate" type="datetime-local" />
-  </div>
-  <button class="submit-btn" onclick="confirmDelay()" style="background:linear-gradient(135deg,#f59e0b,#ef4444)">تأكيد التأجيل</button>
-  <button class="cancel-btn" onclick="closeModal('delayModal')">إلغاء</button>
-</div>
 </div>
 
-<div class="toast" id="toast"></div>
+<!-- ============================================================
+     EVALUATION MODAL (locked)
+============================================================ -->
+<div class="overlay locked" id="evalOverlay">
+  <div class="modal" style="max-width:440px;">
+    <div class="modal-head">
+      <h3>📝 تقييم الالتزام</h3>
+    </div>
+    <div class="modal-body">
+      <div class="task-context-banner">
+        <div class="tc-name" id="evalTaskName">—</div>
+        <div class="tc-time" id="evalTaskTime">—</div>
+      </div>
+
+      <div id="evalQuestionsStandard">
+        <div class="eval-question">
+          <div class="eval-q-text">هل التزمت بأداء المهمة؟</div>
+          <div class="yn-row">
+            <button type="button" class="yn-btn" id="evalYesBtn" onclick="setEvalCommit(true)">نعم</button>
+            <button type="button" class="yn-btn" id="evalNoBtn" onclick="setEvalCommit(false)">لا</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="evalQuestionsHealth" style="display:none;">
+        <div class="eval-question">
+          <div class="eval-q-text">هل التزمت بنفس الوجبة؟</div>
+          <div class="yn-row">
+            <button type="button" class="yn-btn" id="evalMealYesBtn" onclick="setEvalMealCommit(true)">نعم</button>
+            <button type="button" class="yn-btn" id="evalMealNoBtn" onclick="setEvalMealCommit(false)">لا</button>
+          </div>
+        </div>
+        <div class="eval-question">
+          <div class="eval-q-text">هل التزمت بنفس المقدار والغرامات؟</div>
+          <div class="yn-row">
+            <button type="button" class="yn-btn" id="evalGramsYesBtn" onclick="setEvalGramsCommit(true)">نعم</button>
+            <button type="button" class="yn-btn" id="evalGramsNoBtn" onclick="setEvalGramsCommit(false)">لا</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="eval-question">
+        <div class="eval-q-text">نسبة الالتزام الرقمي</div>
+        <div class="slider-wrap">
+          <div class="slider-val" id="evalSliderVal">75%</div>
+          <input type="range" id="evalSlider" min="0" max="100" value="75" oninput="document.getElementById('evalSliderVal').textContent=this.value+'%'">
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-primary" style="width:100%;" onclick="submitEvaluation()">حفظ التقييم</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-stack" id="toastStack"></div>
 
 <script>
-// ═══════════════════════════════
-// Supabase Setup
-// ═══════════════════════════════
-const SUPABASE_URL = 'https://zwpjyrsnyqsokuhtfkwv.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp3cGp5cnNueXFzb2t1aHRma3d2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI1Nzg0MTYsImV4cCI6MjA5ODE1NDQxNn0.CuBingDnPVUo7gHljg7xpNzFilbnM9cqI3IaWY7B_2M';
-const { createClient } = supabase;
-const db = createClient(SUPABASE_URL, SUPABASE_KEY);
+/* ============================================================
+   نظام حياتي — Personal Life & Business OS
+   Core Application Logic
+============================================================ */
 
-let tasks = [];
-let currentTab = 'all';
-let currentForm = {priority:'',location:'',type:'',delayType:'',delayReason:''};
-let delayingTaskId = null;
-let realtimeChannel = null;
+/* ---------- 1. SUPABASE CONFIGURATION ----------
+   استبدل القيمتين التاليتين ببيانات مشروعك في Supabase:
+   1) افتح لوحة تحكم مشروعك في supabase.com
+   2) اذهب إلى Project Settings > API
+   3) انسخ "Project URL" و "anon public key" وضعهما هنا
+------------------------------------------------- */
+const SUPABASE_URL = "https://YOUR-PROJECT-REF.supabase.co";
+const SUPABASE_ANON_KEY = "YOUR-SUPABASE-ANON-KEY";
 
-// ═══════════════════════════════
-// Init
-// ═══════════════════════════════
-async function init() {
-  updateDate();
-  setInterval(updateDate, 60000);
-  await setupDatabase();
-  await loadTasks();
-  setupRealtime();
+// خرائط أسماء الجداول الفعلية في قاعدة البيانات — تستخدم بادئة los_ لتفادي
+// أي تعارض مع جداول موجودة مسبقاً في نفس مشروع Supabase (مثل تطبيقات أخرى لديك)
+const TABLE_MAP = {
+  tasks: "los_tasks",
+  diet_items: "los_diet_items",
+  performance_logs: "los_performance_logs",
+  delays: "los_delays"
+};
+
+let supabaseClient = null;
+let isSupabaseConfigured = false;
+
+try {
+  if (!SUPABASE_URL.includes("YOUR-PROJECT-REF") && !SUPABASE_ANON_KEY.includes("YOUR-SUPABASE-ANON-KEY")) {
+    supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    isSupabaseConfigured = true;
+  }
+} catch (e) {
+  console.error("Supabase init error:", e);
 }
 
-async function setupDatabase() {
-  setSyncStatus('syncing', 'جاري الاتصال...');
+/* ---------- 2. GLOBAL STATE ---------- */
+const AppState = {
+  tasks: [],            // all tasks fetched from Supabase (or local fallback)
+  diet_items: [],        // all diet items
+  performance_logs: [],  // all performance logs
+  delays: [],             // all delay records
+  currentView: "dashboard",
+  currentAxis: "all",
+  currentDayFilter: "today",
+  selectedAxisInForm: "Business",
+  ingredientCounter: 0,
+  activeDelayTaskId: null,
+  activeEvalTask: null,
+  evalCommit: null,       // true/false for standard commit question
+  evalMealCommit: null,   // true/false for health meal question
+  evalGramsCommit: null,  // true/false for health grams question
+  notifiedTaskIds: new Set(),   // 10-min-before TTS already fired
+  evaluatedTaskIds: new Set(),  // tasks that already have a performance_log
+  evalQueue: [],           // queue of tasks pending evaluation overlay
+  localIdCounter: 1,
+  weeklyChartInstance: null
+};
+
+const AXIS_LABELS = { Business: "الأعمال", Health: "الصحة", Faith: "العبادة" };
+const AXIS_COLORS = { Business: "#6c63ff", Health: "#10b981", Faith: "#f59e0b" };
+const PRIORITY_LABELS = { Max: "أقصى أولوية", Medium: "متوسطة", Normal: "عادية" };
+const LOCATION_LABELS = { External: "خارجي", Office: "المكتب", Remote: "عن بُعد" };
+const MODE_LABELS = { "Deep Focus": "تركيز عميق", "Execution": "تنفيذ", "Communication": "تواصل", "Administrative": "إداري" };
+const RECURRENCE_LABELS = { Once: "مرة واحدة", Daily: "يومي", Weekly: "أسبوعي" };
+
+/* ---------- 3. UTILITIES ---------- */
+function uid() {
+  return "local-" + (AppState.localIdCounter++) + "-" + Date.now();
+}
+
+function toLocalDatetimeInputValue(date) {
+  const d = new Date(date);
+  const pad = n => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+function formatTime(dateStr) {
+  const d = new Date(dateStr);
+  return d.toLocaleTimeString("ar-SA", { hour: "2-digit", minute: "2-digit" });
+}
+
+function formatDateLabel(dateStr) {
+  const d = new Date(dateStr);
+  return d.toLocaleDateString("ar-SA", { weekday: "long", day: "numeric", month: "long" });
+}
+
+function isSameDay(a, b) {
+  const d1 = new Date(a), d2 = new Date(b);
+  return d1.getFullYear() === d2.getFullYear() && d1.getMonth() === d2.getMonth() && d1.getDate() === d2.getDate();
+}
+
+function showToast(title, msg, type = "success") {
+  const stack = document.getElementById("toastStack");
+  const el = document.createElement("div");
+  el.className = "toast " + type;
+  const icon = type === "danger" ? "⚠️" : type === "warning" ? "🔔" : "✅";
+  el.innerHTML = `<span class="t-ico">${icon}</span><div><div class="t-title">${title}</div><div class="t-msg">${msg}</div></div>`;
+  stack.appendChild(el);
+  setTimeout(() => { el.style.opacity = "0"; el.style.transform = "translateY(6px)"; el.style.transition = ".25s"; setTimeout(() => el.remove(), 260); }, 4200);
+}
+
+function openModal(id) { document.getElementById(id).classList.add("show"); }
+function closeModal(id) { document.getElementById(id).classList.remove("show"); }
+
+/* ---------- 4. SUPABASE / LOCAL FALLBACK DATA LAYER ---------- */
+async function fetchAllData() {
+  if (!isSupabaseConfigured) {
+    updateSyncPill(false, "وضع محلي — لم يتم ربط Supabase بعد");
+    renderAll();
+    return;
+  }
   try {
-    const { error } = await db.rpc('create_tasks_if_not_exists').maybeSingle();
-  } catch(e) {}
-
-  // Create table via direct insert attempt
-  const { error } = await db.from('tasks').select('id').limit(1);
-  if(error && error.code === '42P01') {
-    // Table doesn't exist - create it
-    await db.rpc('exec_sql', {
-      sql: `CREATE TABLE IF NOT EXISTS tasks (
-        id TEXT PRIMARY KEY,
-        name TEXT NOT NULL,
-        priority TEXT,
-        location TEXT,
-        type TEXT,
-        duration TEXT,
-        date TEXT,
-        status TEXT DEFAULT 'pending',
-        delay_reason TEXT,
-        delay_type TEXT,
-        delay_note TEXT,
-        created_at TIMESTAMPTZ DEFAULT NOW(),
-        updated_at TIMESTAMPTZ DEFAULT NOW()
-      );`
-    });
+    const [tasksRes, dietRes, perfRes, delaysRes] = await Promise.all([
+      supabaseClient.from(TABLE_MAP.tasks).select("*").order("start_time", { ascending: true }),
+      supabaseClient.from(TABLE_MAP.diet_items).select("*"),
+      supabaseClient.from(TABLE_MAP.performance_logs).select("*"),
+      supabaseClient.from(TABLE_MAP.delays).select("*")
+    ]);
+    if (tasksRes.error) throw tasksRes.error;
+    AppState.tasks = tasksRes.data || [];
+    AppState.diet_items = dietRes.data || [];
+    AppState.performance_logs = perfRes.data || [];
+    AppState.delays = delaysRes.data || [];
+    AppState.evaluatedTaskIds = new Set(AppState.performance_logs.map(p => String(p.task_id)));
+    updateSyncPill(true, "متصل ومتزامن مع Supabase");
+    renderAll();
+  } catch (err) {
+    console.error(err);
+    updateSyncPill(false, "تعذر الاتصال — تحقق من بيانات Supabase");
   }
 }
 
-// ═══════════════════════════════
-// Load Tasks
-// ═══════════════════════════════
-async function loadTasks() {
-  setSyncStatus('syncing', 'جاري التحميل...');
-  try {
-    const { data, error } = await db
-      .from('tasks')
-      .select('*')
-      .order('created_at', { ascending: false });
+function updateSyncPill(online, text) {
+  const pill = document.getElementById("syncPill");
+  pill.classList.toggle("online", online);
+  pill.classList.toggle("offline", !online);
+  document.getElementById("syncText").textContent = text;
+}
 
-    if(error) throw error;
+function subscribeRealtime() {
+  if (!isSupabaseConfigured) return;
+  supabaseClient
+    .channel("life-os-realtime")
+    .on("postgres_changes", { event: "*", schema: "public", table: TABLE_MAP.tasks }, () => fetchAllData())
+    .on("postgres_changes", { event: "*", schema: "public", table: TABLE_MAP.performance_logs }, () => fetchAllData())
+    .on("postgres_changes", { event: "*", schema: "public", table: TABLE_MAP.delays }, () => fetchAllData())
+    .on("postgres_changes", { event: "*", schema: "public", table: TABLE_MAP.diet_items }, () => fetchAllData())
+    .subscribe();
+}
 
-    tasks = (data || []).map(t => ({
-      id: t.id,
-      name: t.name,
-      priority: t.priority || '2',
-      location: t.location || '',
-      type: t.type || '',
-      duration: t.duration || '',
-      date: t.date || '',
-      status: t.status || 'pending',
-      delayReason: t.delay_reason || '',
-      delayType: t.delay_type || '',
-      delayNote: t.delay_note || '',
-      createdAt: t.created_at
-    }));
-
-    setSyncStatus('ok', 'متصل');
-    render();
-    checkUrgentTasks();
-  } catch(e) {
-    setSyncStatus('error', 'خطأ في الاتصال');
-    showToast('تعذّر الاتصال — تحقق من الإنترنت', 'error');
-    render();
+async function dbInsert(table, row) {
+  if (!isSupabaseConfigured) {
+    const withId = { ...row, id: uid() };
+    AppState[table].push(withId);
+    return withId;
   }
+  const { data, error } = await supabaseClient.from(TABLE_MAP[table]).insert(row).select().single();
+  if (error) { console.error(error); showToast("خطأ", "فشل الحفظ في قاعدة البيانات", "danger"); throw error; }
+  return data;
 }
 
-// ═══════════════════════════════
-// Realtime Sync
-// ═══════════════════════════════
-function setupRealtime() {
-  realtimeChannel = db
-    .channel('tasks-changes')
-    .on('postgres_changes', {
-      event: '*',
-      schema: 'public',
-      table: 'tasks'
-    }, (payload) => {
-      handleRealtimeChange(payload);
-    })
-    .subscribe((status) => {
-      if(status === 'SUBSCRIBED') setSyncStatus('ok', 'متصل');
-      if(status === 'CHANNEL_ERROR') setSyncStatus('error', 'انقطع الاتصال');
-    });
-}
-
-function handleRealtimeChange(payload) {
-  const { eventType, new: newRow, old: oldRow } = payload;
-
-  if(eventType === 'INSERT') {
-    const exists = tasks.find(t => t.id === newRow.id);
-    if(!exists) {
-      tasks.unshift(mapRow(newRow));
-      showToast('📋 مهمة جديدة مزامنة');
-    }
-  } else if(eventType === 'UPDATE') {
-    const idx = tasks.findIndex(t => t.id === newRow.id);
-    if(idx !== -1) tasks[idx] = mapRow(newRow);
-  } else if(eventType === 'DELETE') {
-    tasks = tasks.filter(t => t.id !== oldRow.id);
+async function dbUpdate(table, id, patch) {
+  if (!isSupabaseConfigured) {
+    const idx = AppState[table].findIndex(r => String(r.id) === String(id));
+    if (idx > -1) AppState[table][idx] = { ...AppState[table][idx], ...patch };
+    return;
   }
-
-  render();
+  const { error } = await supabaseClient.from(TABLE_MAP[table]).update(patch).eq("id", id);
+  if (error) { console.error(error); showToast("خطأ", "فشل التحديث", "danger"); throw error; }
 }
 
-function mapRow(r) {
-  return {
-    id: r.id, name: r.name,
-    priority: r.priority || '2',
-    location: r.location || '',
-    type: r.type || '',
-    duration: r.duration || '',
-    date: r.date || '',
-    status: r.status || 'pending',
-    delayReason: r.delay_reason || '',
-    delayType: r.delay_type || '',
-    delayNote: r.delay_note || '',
-    createdAt: r.created_at
-  };
+async function dbDelete(table, id) {
+  if (!isSupabaseConfigured) {
+    AppState[table] = AppState[table].filter(r => String(r.id) !== String(id));
+    return;
+  }
+  const { error } = await supabaseClient.from(TABLE_MAP[table]).delete().eq("id", id);
+  if (error) { console.error(error); showToast("خطأ", "فشل الحذف", "danger"); throw error; }
 }
 
-// ═══════════════════════════════
-// Sync Status
-// ═══════════════════════════════
-function setSyncStatus(status, text) {
-  const dot = document.getElementById('syncDot');
-  const txt = document.getElementById('syncText');
-  dot.className = 'sync-dot' + (status === 'syncing' ? ' syncing' : status === 'error' ? ' error' : '');
-  txt.textContent = text;
+/* ---------- 5. NAVIGATION / VIEW SWITCHING ---------- */
+function setView(view, axis) {
+  AppState.currentView = view;
+  if (axis !== undefined) AppState.currentAxis = axis;
+
+  document.querySelectorAll(".nav-item").forEach(el => el.classList.remove("active"));
+  const navEl = axis !== undefined
+    ? document.querySelector(`.nav-item[data-view="${view}"][data-axis="${axis}"]`)
+    : document.querySelector(`.nav-item[data-view="${view}"]`);
+  if (navEl) navEl.classList.add("active");
+
+  document.getElementById("view-dashboard").style.display = view === "dashboard" ? "block" : "none";
+  document.getElementById("view-reports").style.display = view === "reports" ? "block" : "none";
+
+  const titles = { all: "نظرة عامة", Business: "إدارة الأعمال اليومية", Health: "إدارة الصحة", Faith: "إدارة العبادة" };
+  document.getElementById("pageTitle").textContent = view === "reports" ? "التقارير وتحليل الخلل" : (titles[axis] || "نظرة عامة");
+
+  if (window.innerWidth <= 900) document.getElementById("sidebar").classList.remove("open");
+
+  if (view === "reports") { renderReports(); } else { renderDashboard(); }
 }
 
-// ═══════════════════════════════
-// UI
-// ═══════════════════════════════
-function updateDate() {
+function setDayFilter(f) {
+  AppState.currentDayFilter = f;
+  document.querySelectorAll("#quickFilters .chip").forEach(c => c.classList.toggle("active", c.dataset.chip === f));
+  renderDashboard();
+}
+
+/* ---------- 6. RENDER: DASHBOARD ---------- */
+function renderAll() {
+  document.getElementById("pageDate").textContent = formatDateLabel(new Date());
+  renderDashboard();
+  if (AppState.currentView === "reports") renderReports();
+}
+
+function getFilteredTasks() {
+  let list = [...AppState.tasks];
+  if (AppState.currentAxis !== "all") list = list.filter(t => t.axis_type === AppState.currentAxis);
+
   const now = new Date();
-  const days = ['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
-  document.getElementById('dateDisplay').textContent = days[now.getDay()] + ' ' + now.toLocaleDateString('ar-SA');
+  if (AppState.currentDayFilter === "today") {
+    list = list.filter(t => isSameDay(t.start_time, now));
+  } else if (AppState.currentDayFilter === "upcoming") {
+    list = list.filter(t => new Date(t.start_time) > now);
+  }
+  list.sort((a, b) => new Date(a.start_time) - new Date(b.start_time));
+  return list;
 }
 
-function setTab(tab, el) {
-  currentTab = tab;
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  el.classList.add('active');
-  render();
-}
+function renderDashboard() {
+  renderStatRow();
+  const list = getFilteredTasks();
+  const container = document.getElementById("taskList");
 
-function updateStats() {
-  const total = tasks.length;
-  const done = tasks.filter(t => t.status === 'done').length;
-  const delayed = tasks.filter(t => t.status === 'delayed').length;
-  const pending = total - done - delayed;
-  document.getElementById('statTotal').textContent = total;
-  document.getElementById('statDone').textContent = done;
-  document.getElementById('statPending').textContent = pending;
-  document.getElementById('statDelayed').textContent = delayed;
-}
-
-function render() {
-  updateStats();
-  const content = document.getElementById('mainContent');
-  if(currentTab === 'report') { renderReport(); return; }
-
-  let filtered = tasks;
-  if(currentTab === 'today') filtered = tasks.filter(t => t.status !== 'done' && t.priority === '1');
-  else if(currentTab === 'pending') filtered = tasks.filter(t => t.status === 'pending');
-  else if(currentTab === 'delayed') filtered = tasks.filter(t => t.status === 'delayed');
-  else if(currentTab === 'done') filtered = tasks.filter(t => t.status === 'done');
-
-  if(filtered.length === 0) {
-    content.innerHTML = `<div class="empty"><div class="empty-icon">${currentTab==='done'?'🎉':'📋'}</div><div class="empty-text">${currentTab==='done'?'لا توجد مهام منجزة بعد':'لا توجد مهام<br>اضغط + لإضافة مهمة جديدة'}</div></div>`;
+  if (list.length === 0) {
+    container.innerHTML = `<div class="empty-state">
+      <div class="e-icon">🗂️</div>
+      <div class="e-title">لا توجد مهام لعرضها</div>
+      <div>ابدأ بإضافة مهمة جديدة من الزر أعلاه</div>
+    </div>`;
     return;
   }
 
-  let html = '';
-  if(currentTab === 'all' || currentTab === 'today') {
-    const total = tasks.length;
-    const done = tasks.filter(t=>t.status==='done').length;
-    const pct = total ? Math.round(done/total*100) : 0;
-    const circ = 2 * Math.PI * 24;
-    const offset = circ - (pct/100)*circ;
-    html += `<div class="progress-wrap">
-      <div class="ring-wrap">
-        <svg width="56" height="56" viewBox="0 0 56 56">
-          <circle class="ring-bg" cx="28" cy="28" r="24"/>
-          <circle class="ring-fill" cx="28" cy="28" r="24" stroke-dasharray="${circ}" stroke-dashoffset="${offset}"/>
-        </svg>
-        <div class="ring-text">${pct}%</div>
-      </div>
-      <div class="progress-info">
-        <h3>تقدم اليوم</h3>
-        <p>${done} منجزة من ${total} مهمة</p>
-      </div>
-    </div>`;
-  }
-
-  filtered.forEach(task => {
-    const isDone = task.status === 'done';
-    const isDelayed = task.status === 'delayed';
-    const pClass = `p${task.priority}`;
-    const pLabel = task.priority==='1'?'⚡ قصوى':task.priority==='2'?'🔶 متوسطة':'🔷 منخفضة';
-    const pPill = task.priority==='1'?'pill-p1':task.priority==='2'?'pill-p2':'pill-p3';
-    const dateStr = task.date ? new Date(task.date).toLocaleString('ar-SA',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}) : '';
-
-    html += `<div class="task-card ${pClass} ${isDone?'done-card':''}">
-      <div class="task-header">
-        <div class="task-check ${isDone?'checked':''}" onclick="toggleDone('${task.id}')">
-          <svg viewBox="0 0 14 14"><polyline points="2,7 6,11 12,3"/></svg>
-        </div>
-        <div class="task-name ${isDone?'done-text':''}">${task.name}</div>
-      </div>
-      <div class="task-meta">
-        <span class="meta-pill ${pPill}">${pLabel}</span>
-        ${task.location?`<span class="meta-pill pill-loc">📍 ${task.location}</span>`:''}
-        ${task.duration?`<span class="meta-pill pill-dur">⏱ ${task.duration} د</span>`:''}
-        ${task.type?`<span class="meta-pill pill-type">${task.type}</span>`:''}
-        ${isDelayed&&task.delayReason?`<span class="meta-pill" style="background:rgba(239,68,68,.15);color:#fca5a5">⏸ ${task.delayReason}</span>`:''}
-        ${dateStr?`<span class="meta-pill" style="background:rgba(56,189,248,.1);color:var(--accent3)">🕐 ${dateStr}</span>`:''}
-      </div>
-      <div class="task-actions">
-        <button class="action-btn btn-bell" onclick="ringBell('${task.name}')">🔔</button>
-        ${task.date?`<button class="action-btn btn-calendar" onclick="addToCalendar('${task.id}')">📅</button>`:''}
-        ${!isDone?`<button class="action-btn btn-delay" onclick="openDelayModal('${task.id}')">⏸ تأجيل</button>`:''}
-        <button class="action-btn btn-delete" onclick="deleteTask('${task.id}')">🗑</button>
-      </div>
-    </div>`;
-  });
-
-  content.innerHTML = html;
+  container.innerHTML = list.map(taskCardHTML).join("");
 }
 
-function renderReport() {
-  const total = tasks.length;
-  const done = tasks.filter(t=>t.status==='done').length;
-  const delayed = tasks.filter(t=>t.status==='delayed').length;
-  const pct = total ? Math.round(done/total*100) : 0;
+function taskCardHTML(t) {
+  const axisColor = AXIS_COLORS[t.axis_type] || "var(--accent)";
+  const isDelayed = t.status === "delayed";
+  const evaluated = AppState.evaluatedTaskIds.has(String(t.id));
+  const dietItems = AppState.diet_items.filter(d => String(d.task_id) === String(t.id));
 
-  const reasons = {};
-  tasks.filter(t=>t.delayReason).forEach(t=>{
-    reasons[t.delayReason] = (reasons[t.delayReason]||0)+1;
-  });
+  let metaBits = "";
+  if (t.axis_type === "Health") {
+    const summary = dietItems.map(d => `${d.item_name} (${d.grams}غ)`).join("، ");
+    metaBits += `<span>🍽 ${summary || "بدون مكونات مسجلة"}</span>`;
+  } else {
+    metaBits += `<span>📍 ${LOCATION_LABELS[t.location] || t.location || "—"}</span>`;
+    metaBits += `<span>🧠 ${MODE_LABELS[t.mental_mode] || t.mental_mode || "—"}</span>`;
+  }
+  metaBits += `<span>🔁 ${RECURRENCE_LABELS[t.recurrence] || t.recurrence}</span>`;
 
-  let topReason = '', topCount = 0;
-  Object.entries(reasons).forEach(([r,c])=>{ if(c>topCount){topReason=r;topCount=c;} });
+  const priorityBadge = t.priority ? `<span class="badge badge-priority-${t.priority}">${PRIORITY_LABELS[t.priority] || t.priority}</span>` : "";
+  const statusBadge = isDelayed ? `<span class="badge badge-status">مؤجّلة</span>` : (evaluated ? `<span class="badge badge-status">تم التقييم</span>` : "");
 
-  const patterns = {
-    'الوقت لم يكفِ': {diag:'جدولك أثقل من وقتك المتاح', sol:'قلّل المهام اليومية بمهمة واحدة أو مد وقت العمل'},
-    'طارئ خارجي': {diag:'الطوارئ تتكرر بشكل يمكن توقعه', sol:'اترك 30-45 دقيقة يومياً احتياطية'},
-    'ناقص معلومات': {diag:'تضيف مهاماً قبل توفر متطلباتها', sol:'اسأل: ما المطلوب قبل البدء؟'},
-    'أصعب مما توقعت': {diag:'تقدّر وقت المهام بأقل من الواقع', sol:'أضف بافر 30% على كل مدة'},
-    'تغيّرت الأولويات': {diag:'بيئة عملك ديناميكية جداً', sol:'راجع الجدول كل صباح 5 دقائق'},
-    'إجهاد / طاقة منخفضة': {diag:'أوقات عملك لا تناسب طاقتك', sol:'راجع توقيت جلسة العمل اليومية'},
-    'أحتاج شخصاً آخر': {diag:'مهامك مرتبطة بأشخاص أكثر مما تظن', sol:'حدد التبعيات عند إضافة كل مهمة'},
-  };
-
-  const pat = patterns[topReason] || null;
-
-  let html = `<div class="report-card">
-    <div class="report-title">📊 ملخص الأسبوع</div>
-    <div class="pattern-item"><span>إجمالي المهام</span><span class="pattern-count">${total}</span></div>
-    <div class="pattern-item"><span>منجزة</span><span style="color:var(--success);font-weight:700">${done}</span></div>
-    <div class="pattern-item"><span>مؤجلة</span><span style="color:var(--danger);font-weight:700">${delayed}</span></div>
-    <div class="pattern-item"><span>معدل الإنجاز</span><span style="color:var(--accent2);font-weight:700">${pct}%</span></div>
+  return `
+  <div class="task-card ${isDelayed ? 'status-delayed' : ''}" style="--axis-color:${axisColor}">
+    <div class="task-time">
+      <div class="t-start">${formatTime(t.start_time)}</div>
+      <div class="t-dur">${t.duration} د</div>
+    </div>
+    <div class="task-body">
+      <div class="task-name">
+        ${escapeHtml(t.name)}
+        <span class="badge badge-axis-${t.axis_type}">${AXIS_LABELS[t.axis_type]}</span>
+        ${priorityBadge}
+        ${statusBadge}
+      </div>
+      <div class="task-meta">${metaBits}</div>
+    </div>
+    <div class="task-actions">
+      <button class="icon-btn" title="تأجيل" onclick="openDelayModal('${t.id}')">⏳</button>
+      <button class="icon-btn" title="تعديل" onclick="editTask('${t.id}')">✎</button>
+      <button class="icon-btn danger" title="حذف" onclick="deleteTask('${t.id}')">🗑</button>
+    </div>
   </div>`;
-
-  if(Object.keys(reasons).length > 0) {
-    html += `<div class="report-card"><div class="report-title">⏸ أسباب التأجيل</div>`;
-    Object.entries(reasons).sort((a,b)=>b[1]-a[1]).forEach(([r,c])=>{
-      html += `<div class="pattern-item"><span>${r}</span><span class="pattern-count">${c} مرات</span></div>`;
-    });
-    if(pat) html += `<div class="insight-box">🔍 <strong>التشخيص:</strong> ${pat.diag}<br><br>✅ <strong>التوصية:</strong> ${pat.sol}</div>`;
-    html += `</div>`;
-  }
-
-  if(total === 0) html = `<div class="empty"><div class="empty-icon">📊</div><div class="empty-text">أضف مهام أولاً لتظهر التقارير</div></div>`;
-  document.getElementById('mainContent').innerHTML = html;
 }
 
-// ═══════════════════════════════
-// CRUD Operations
-// ═══════════════════════════════
-async function addTask() {
-  const name = document.getElementById('taskName').value.trim();
-  if(!name) { showToast('اكتب اسم المهمة أولاً', 'warn'); return; }
-  if(!currentForm.priority) { showToast('اختر درجة الأهمية', 'warn'); return; }
+function escapeHtml(str) {
+  if (!str) return "";
+  return String(str).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+}
 
-  const task = {
-    id: Date.now().toString(36) + Math.random().toString(36).slice(2),
-    name,
-    priority: currentForm.priority,
-    location: currentForm.location,
-    type: currentForm.type,
-    duration: document.getElementById('taskDuration').value,
-    date: document.getElementById('taskDate').value,
-    status: 'pending',
-    delay_reason: '',
-    delay_type: '',
-    delay_note: ''
-  };
+function renderStatRow() {
+  const axes = ["Business", "Health", "Faith"];
+  const html = axes.map(axis => {
+    const logs = AppState.performance_logs.filter(p => p.axis_type === axis);
+    const avg = logs.length ? Math.round(logs.reduce((s, l) => s + (l.commitment_percentage || 0), 0) / logs.length) : 0;
+    const cls = axis.toLowerCase();
+    return `<div class="stat-card ${cls}">
+      <div class="stat-label"><span>${AXIS_LABELS[axis]}</span><span>${logs.length} تقييم</span></div>
+      <div class="stat-num">${avg}%</div>
+      <div class="stat-bar"><div style="width:${avg}%"></div></div>
+    </div>`;
+  }).join("");
+  document.getElementById("statRow").innerHTML = html;
+}
 
-  setSyncStatus('syncing', 'جاري الحفظ...');
-  const { error } = await db.from('tasks').insert([task]);
+/* ---------- 7. TASK FORM: OPEN / AXIS SWITCH / INGREDIENTS ---------- */
+function openTaskModal(taskId) {
+  document.getElementById("taskModalTitle").textContent = taskId ? "تعديل المهمة" : "إضافة مهمة جديدة";
+  document.getElementById("f_id").value = taskId || "";
+  document.getElementById("f_name").value = "";
+  document.getElementById("f_notes").value = "";
+  document.getElementById("f_priority").value = "Medium";
+  document.getElementById("f_location").value = "Office";
+  document.getElementById("f_mode").value = "Deep Focus";
+  document.getElementById("f_recurrence").value = "Once";
+  document.getElementById("f_duration").value = 30;
 
-  if(error) {
-    showToast('خطأ في الحفظ — تحقق من الإنترنت', 'error');
-    setSyncStatus('error', 'خطأ');
+  const defaultStart = new Date(Date.now() + 15 * 60000);
+  document.getElementById("f_start").value = toLocalDatetimeInputValue(defaultStart);
+
+  document.getElementById("ingredientRows").innerHTML = "";
+  AppState.ingredientCounter = 0;
+  addIngredientRow();
+
+  chooseAxis("Business");
+  recalcEndTime();
+  openModal("taskOverlay");
+}
+
+function chooseAxis(axis) {
+  AppState.selectedAxisInForm = axis;
+  document.querySelectorAll(".axis-opt").forEach(el => el.classList.toggle("sel", el.dataset.axis === axis));
+  const isHealth = axis === "Health";
+  document.getElementById("standardFields").style.display = isHealth ? "none" : "block";
+  document.getElementById("healthFields").style.display = isHealth ? "block" : "none";
+  document.getElementById("nonHealthFields").style.display = isHealth ? "none" : "block";
+}
+
+function addIngredientRow(name = "", grams = "") {
+  AppState.ingredientCounter++;
+  const rowId = "ing-" + AppState.ingredientCounter;
+  const wrap = document.getElementById("ingredientRows");
+  const row = document.createElement("div");
+  row.className = "ing-row";
+  row.id = rowId;
+  row.innerHTML = `
+    <input type="text" placeholder="اسم الطبق" class="ing-name" value="${escapeHtml(name)}">
+    <input type="number" placeholder="غرامات" class="ing-grams" min="0" value="${grams}">
+    <button type="button" class="ing-remove" onclick="removeIngredientRow('${rowId}')">✕</button>
+  `;
+  wrap.appendChild(row);
+}
+
+function removeIngredientRow(rowId) {
+  const wrap = document.getElementById("ingredientRows");
+  if (wrap.children.length <= 1) { showToast("تنبيه", "يجب أن تحتوي الوجبة على مكوّن واحد على الأقل", "warning"); return; }
+  document.getElementById(rowId).remove();
+}
+
+function recalcEndTime() {
+  const startVal = document.getElementById("f_start").value;
+  const duration = parseInt(document.getElementById("f_duration").value || "0", 10);
+  if (!startVal || !duration) { document.getElementById("f_end_display").textContent = "—"; return; }
+  const start = new Date(startVal);
+  const end = new Date(start.getTime() + duration * 60000);
+  document.getElementById("f_end_display").textContent =
+    end.toLocaleDateString("ar-SA", { day: "numeric", month: "short" }) + " — " +
+    end.toLocaleTimeString("ar-SA", { hour: "2-digit", minute: "2-digit" });
+}
+
+/* ---------- 8. CONFLICT PREVENTION ---------- */
+function findConflict(startISO, endISO, excludeId) {
+  const start = new Date(startISO).getTime();
+  const end = new Date(endISO).getTime();
+  return AppState.tasks.find(t => {
+    if (excludeId && String(t.id) === String(excludeId)) return false;
+    const tStart = new Date(t.start_time).getTime();
+    const tEnd = new Date(t.end_time).getTime();
+    return start < tEnd && end > tStart;
+  });
+}
+
+/* ---------- 9. SAVE TASK (with conflict check + health ingredients) ---------- */
+async function submitTask() {
+  const axis = AppState.selectedAxisInForm;
+  const startVal = document.getElementById("f_start").value;
+  const duration = parseInt(document.getElementById("f_duration").value || "0", 10);
+
+  if (!startVal || !duration || duration <= 0) {
+    showToast("بيانات ناقصة", "يرجى تحديد وقت البدء والمدة", "danger");
     return;
   }
 
-  closeModal('addModal');
-  showToast('تمت إضافة المهمة ✓');
-  setSyncStatus('ok', 'متصل');
+  const start = new Date(startVal);
+  const end = new Date(start.getTime() + duration * 60000);
+  const editingId = document.getElementById("f_id").value || null;
 
-  if(task.date) setTimeout(() => addToCalendarById(task.id, task), 500);
+  let name, mealType = null, ingredients = [];
+  if (axis === "Health") {
+    mealType = document.getElementById("f_mealtype").value;
+    name = mealType;
+    document.querySelectorAll("#ingredientRows .ing-row").forEach(row => {
+      const iName = row.querySelector(".ing-name").value.trim();
+      const iGrams = row.querySelector(".ing-grams").value;
+      if (iName) ingredients.push({ item_name: iName, grams: parseFloat(iGrams) || 0 });
+    });
+    if (ingredients.length === 0) {
+      showToast("بيانات ناقصة", "أضف مكوّناً واحداً على الأقل للوجبة", "danger");
+      return;
+    }
+  } else {
+    name = document.getElementById("f_name").value.trim();
+    if (!name) {
+      showToast("بيانات ناقصة", "يرجى إدخال اسم المهمة", "danger");
+      return;
+    }
+  }
+
+  // Conflict Prevention Algorithm
+  const conflict = findConflict(start.toISOString(), end.toISOString(), editingId);
+  if (conflict) {
+    document.getElementById("conflictTaskName").textContent = conflict.name;
+    document.getElementById("conflictTaskTime").textContent =
+      formatTime(conflict.start_time) + " — " + formatTime(conflict.end_time);
+    openModal("conflictOverlay");
+    return;
+  }
+
+  const payload = {
+    name,
+    axis_type: axis,
+    priority: axis === "Health" ? "Normal" : document.getElementById("f_priority").value,
+    duration,
+    start_time: start.toISOString(),
+    end_time: end.toISOString(),
+    recurrence: document.getElementById("f_recurrence").value,
+    location: axis === "Health" ? null : document.getElementById("f_location").value,
+    mental_mode: axis === "Health" ? null : document.getElementById("f_mode").value,
+    notes: document.getElementById("f_notes").value.trim(),
+    status: "pending"
+  };
+
+  try {
+    let taskRow;
+    if (editingId) {
+      await dbUpdate("tasks", editingId, payload);
+      taskRow = { ...payload, id: editingId };
+      // remove old diet items before re-inserting
+      const oldItems = AppState.diet_items.filter(d => String(d.task_id) === String(editingId));
+      for (const item of oldItems) await dbDelete("diet_items", item.id);
+      if (!isSupabaseConfigured) AppState.diet_items = AppState.diet_items.filter(d => String(d.task_id) !== String(editingId));
+    } else {
+      taskRow = await dbInsert("tasks", payload);
+    }
+
+    if (axis === "Health") {
+      for (const ing of ingredients) {
+        await dbInsert("diet_items", { task_id: taskRow.id, item_name: ing.item_name, grams: ing.grams });
+      }
+    }
+
+    showToast("تم الحفظ", "تم حفظ المهمة بنجاح", "success");
+    closeModal("taskOverlay");
+    if (!isSupabaseConfigured) fetchAllData(); else fetchAllData();
+  } catch (e) {
+    console.error(e);
+  }
 }
 
-async function toggleDone(id) {
-  const task = tasks.find(t => t.id === id);
-  if(!task) return;
-  const newStatus = task.status === 'done' ? 'pending' : 'done';
+function editTask(id) {
+  const t = AppState.tasks.find(t => String(t.id) === String(id));
+  if (!t) return;
+  openTaskModal(id);
+  chooseAxis(t.axis_type);
+  document.getElementById("f_start").value = toLocalDatetimeInputValue(t.start_time);
+  document.getElementById("f_duration").value = t.duration;
+  document.getElementById("f_recurrence").value = t.recurrence || "Once";
+  document.getElementById("f_notes").value = t.notes || "";
 
-  const { error } = await db.from('tasks').update({ status: newStatus, updated_at: new Date().toISOString() }).eq('id', id);
-  if(!error) {
-    task.status = newStatus;
-    render();
-    if(newStatus === 'done') { playBell(); showToast('أحسنت! مهمة منجزة ✓'); }
+  if (t.axis_type === "Health") {
+    document.getElementById("f_mealtype").value = t.name;
+    document.getElementById("ingredientRows").innerHTML = "";
+    AppState.ingredientCounter = 0;
+    const items = AppState.diet_items.filter(d => String(d.task_id) === String(t.id));
+    if (items.length) items.forEach(it => addIngredientRow(it.item_name, it.grams));
+    else addIngredientRow();
+  } else {
+    document.getElementById("f_name").value = t.name;
+    document.getElementById("f_priority").value = t.priority || "Medium";
+    document.getElementById("f_location").value = t.location || "Office";
+    document.getElementById("f_mode").value = t.mental_mode || "Deep Focus";
   }
+  recalcEndTime();
 }
 
 async function deleteTask(id) {
-  const { error } = await db.from('tasks').delete().eq('id', id);
-  if(!error) {
-    tasks = tasks.filter(t => t.id !== id);
-    render();
-    showToast('تم الحذف');
+  if (!confirm("هل أنت متأكد من حذف هذه المهمة؟")) return;
+  const items = AppState.diet_items.filter(d => String(d.task_id) === String(id));
+  for (const item of items) await dbDelete("diet_items", item.id);
+  await dbDelete("tasks", id);
+  showToast("تم الحذف", "تم حذف المهمة", "success");
+  fetchAllData();
+}
+
+/* ---------- 10. DELAY FRAMEWORK ---------- */
+let selectedDelayReason = null;
+
+function openDelayModal(taskId) {
+  const t = AppState.tasks.find(t => String(t.id) === String(taskId));
+  if (!t) return;
+  AppState.activeDelayTaskId = taskId;
+  selectedDelayReason = null;
+  document.querySelectorAll("#delayReasons .reason-opt").forEach(el => el.classList.remove("sel"));
+  document.getElementById("delayNote").value = "";
+  document.getElementById("delayTaskName").textContent = t.name;
+  document.getElementById("delayTaskTime").textContent = formatTime(t.start_time) + " — " + formatTime(t.end_time);
+
+  const newStart = new Date(Date.now() + 30 * 60000);
+  document.getElementById("delayNewTime").value = toLocalDatetimeInputValue(newStart);
+  openModal("delayOverlay");
+}
+
+function chooseReason(el) {
+  document.querySelectorAll("#delayReasons .reason-opt").forEach(e => e.classList.remove("sel"));
+  el.classList.add("sel");
+  selectedDelayReason = el.dataset.r;
+}
+
+async function submitDelay() {
+  const taskId = AppState.activeDelayTaskId;
+  const t = AppState.tasks.find(t => String(t.id) === String(taskId));
+  if (!t) return;
+
+  const note = document.getElementById("delayNote").value.trim();
+  const reason = selectedDelayReason || (note ? "سبب مخصص" : null);
+  if (!reason) { showToast("بيانات ناقصة", "يرجى اختيار سبب التأجيل أو كتابة ملاحظة", "danger"); return; }
+
+  const newTimeVal = document.getElementById("delayNewTime").value;
+  if (!newTimeVal) { showToast("بيانات ناقصة", "يرجى تحديد الوقت الجديد", "danger"); return; }
+
+  const newStart = new Date(newTimeVal);
+  const newEnd = new Date(newStart.getTime() + t.duration * 60000);
+
+  const conflict = findConflict(newStart.toISOString(), newEnd.toISOString(), t.id);
+  if (conflict) {
+    document.getElementById("conflictTaskName").textContent = conflict.name;
+    document.getElementById("conflictTaskTime").textContent = formatTime(conflict.start_time) + " — " + formatTime(conflict.end_time);
+    openModal("conflictOverlay");
+    return;
   }
+
+  await dbInsert("delays", {
+    task_id: t.id, reason, note: note || null,
+    original_time: t.start_time, new_time: newStart.toISOString()
+  });
+
+  await dbUpdate("tasks", t.id, {
+    start_time: newStart.toISOString(), end_time: newEnd.toISOString(), status: "delayed"
+  });
+
+  AppState.notifiedTaskIds.delete(String(t.id));
+  showToast("تم التأجيل", "تم تحديث موعد المهمة بنجاح", "success");
+  closeModal("delayOverlay");
+  fetchAllData();
 }
 
-async function confirmDelay() {
-  if(!currentForm.delayReason) { showToast('اختر سبب التأجيل', 'warn'); return; }
-  const task = tasks.find(t => t.id === delayingTaskId);
-  if(!task) return;
-
-  const updates = {
-    status: 'delayed',
-    delay_reason: currentForm.delayReason,
-    delay_type: currentForm.delayType,
-    delay_note: document.getElementById('delayNote').value,
-    updated_at: new Date().toISOString()
-  };
-
-  const newDate = document.getElementById('delayNewDate').value;
-  if(newDate) updates.date = newDate;
-
-  const { error } = await db.from('tasks').update(updates).eq('id', delayingTaskId);
-  if(!error) {
-    Object.assign(task, { status: 'delayed', delayReason: updates.delay_reason, delayType: updates.delay_type, delayNote: updates.delay_note });
-    if(newDate) task.date = newDate;
-    closeModal('delayModal');
-    if(task.priority === '1') showToast('⚠️ تنبيه: مهمة قصوى مؤجلة!', 'warn');
-    else showToast('تم تأجيل المهمة');
-    render();
-  }
+/* ---------- 11. EVALUATION LOOP ---------- */
+function setEvalCommit(val) {
+  AppState.evalCommit = val;
+  document.getElementById("evalYesBtn").classList.toggle("sel-yes", val === true);
+  document.getElementById("evalNoBtn").classList.toggle("sel-no", val === false);
+}
+function setEvalMealCommit(val) {
+  AppState.evalMealCommit = val;
+  document.getElementById("evalMealYesBtn").classList.toggle("sel-yes", val === true);
+  document.getElementById("evalMealNoBtn").classList.toggle("sel-no", val === false);
+}
+function setEvalGramsCommit(val) {
+  AppState.evalGramsCommit = val;
+  document.getElementById("evalGramsYesBtn").classList.toggle("sel-yes", val === true);
+  document.getElementById("evalGramsNoBtn").classList.toggle("sel-no", val === false);
 }
 
-// ═══════════════════════════════
-// Calendar
-// ═══════════════════════════════
-function addToCalendar(id) {
-  const task = tasks.find(t => t.id === id);
-  if(!task || !task.date) { showToast('حدد موعداً أولاً', 'warn'); return; }
-  addToCalendarById(id, task);
+function openEvaluationModal(task) {
+  AppState.activeEvalTask = task;
+  AppState.evalCommit = null;
+  AppState.evalMealCommit = null;
+  AppState.evalGramsCommit = null;
+
+  document.getElementById("evalTaskName").textContent = task.name;
+  document.getElementById("evalTaskTime").textContent = formatTime(task.start_time) + " — " + formatTime(task.end_time);
+  document.getElementById("evalSlider").value = 75;
+  document.getElementById("evalSliderVal").textContent = "75%";
+
+  ["evalYesBtn", "evalNoBtn", "evalMealYesBtn", "evalMealNoBtn", "evalGramsYesBtn", "evalGramsNoBtn"].forEach(id => {
+    document.getElementById(id).classList.remove("sel-yes", "sel-no");
+  });
+
+  const isHealth = task.axis_type === "Health";
+  document.getElementById("evalQuestionsStandard").style.display = isHealth ? "none" : "block";
+  document.getElementById("evalQuestionsHealth").style.display = isHealth ? "block" : "none";
+
+  openModal("evalOverlay");
 }
 
-function addToCalendarById(id, task) {
-  const start = new Date(task.date);
-  const end = new Date(start.getTime() + (task.duration||60)*60000);
-  const fmt = d => d.toISOString().replace(/[-:]/g,'').slice(0,15)+'Z';
-  const details = `مهمة: ${task.name}\nالموقع: ${task.location||'-'}\nالمدة: ${task.duration||60} دقيقة`;
-  const url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent('📋 '+task.name)}&dates=${fmt(start)}/${fmt(end)}&details=${encodeURIComponent(details)}`;
-  window.open(url, '_blank');
-  showToast('تم فتح Google Calendar ✓');
-}
+async function submitEvaluation() {
+  const task = AppState.activeEvalTask;
+  if (!task) return;
+  const isHealth = task.axis_type === "Health";
 
-// ═══════════════════════════════
-// Bell Sound
-// ═══════════════════════════════
-function playBell() {
-  try {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    function tone(freq, start, dur, gain) {
-      const o = ctx.createOscillator();
-      const g = ctx.createGain();
-      o.connect(g); g.connect(ctx.destination);
-      o.frequency.value = freq; o.type = 'sine';
-      g.gain.setValueAtTime(0, ctx.currentTime + start);
-      g.gain.linearRampToValueAtTime(gain, ctx.currentTime + start + 0.01);
-      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + start + dur);
-      o.start(ctx.currentTime + start);
-      o.stop(ctx.currentTime + start + dur);
+  if (isHealth) {
+    if (AppState.evalMealCommit === null || AppState.evalGramsCommit === null) {
+      showToast("أكمل الإجابة", "يرجى الإجابة على سؤالي الالتزام بالوجبة والمقدار", "danger");
+      return;
     }
-    tone(523, 0.0, 1.2, 0.4);
-    tone(659, 0.3, 1.0, 0.35);
-    tone(784, 0.6, 1.5, 0.5);
-    tone(1047, 0.9, 2.0, 0.45);
-  } catch(e) {}
-}
-
-function ringBell(name) {
-  playBell();
-  showToast('🔔 تذكير: ' + name);
-}
-
-function checkUrgentTasks() {
-  const urgent = tasks.filter(t => t.priority === '1' && t.status === 'pending');
-  if(urgent.length > 0) {
-    setTimeout(() => {
-      playBell();
-      showToast('⚡ لديك ' + urgent.length + ' مهمة قصوى اليوم!', 'warn');
-    }, 1500);
+  } else {
+    if (AppState.evalCommit === null) {
+      showToast("أكمل الإجابة", "يرجى الإجابة على سؤال الالتزام بالمهمة", "danger");
+      return;
+    }
   }
+
+  const pct = parseInt(document.getElementById("evalSlider").value, 10);
+
+  await dbInsert("performance_logs", {
+    task_id: task.id,
+    axis_type: task.axis_type,
+    is_committed: isHealth ? (AppState.evalMealCommit && AppState.evalGramsCommit) : AppState.evalCommit,
+    commitment_percentage: pct,
+    diet_weight_committed: isHealth ? AppState.evalGramsCommit : null,
+    logged_at: new Date().toISOString()
+  });
+
+  // handle recurrence: auto-clone the task to its next occurrence
+  if (task.recurrence === "Daily" || task.recurrence === "Weekly") {
+    const offsetMs = task.recurrence === "Daily" ? 24 * 3600000 : 7 * 24 * 3600000;
+    const nextStart = new Date(new Date(task.start_time).getTime() + offsetMs);
+    const nextEnd = new Date(new Date(task.end_time).getTime() + offsetMs);
+    const clone = await dbInsert("tasks", {
+      name: task.name, axis_type: task.axis_type, priority: task.priority, duration: task.duration,
+      start_time: nextStart.toISOString(), end_time: nextEnd.toISOString(), recurrence: task.recurrence,
+      location: task.location, mental_mode: task.mental_mode, notes: task.notes, status: "pending"
+    });
+    if (task.axis_type === "Health") {
+      const items = AppState.diet_items.filter(d => String(d.task_id) === String(task.id));
+      for (const it of items) await dbInsert("diet_items", { task_id: clone.id, item_name: it.item_name, grams: it.grams });
+    }
+  }
+
+  AppState.evaluatedTaskIds.add(String(task.id));
+  showToast("تم الحفظ", "تم تسجيل تقييم الالتزام", "success");
+  closeModal("evalOverlay");
+  AppState.activeEvalTask = null;
+  processEvalQueue();
+  fetchAllData();
 }
 
-// ═══════════════════════════════
-// Modal & Form
-// ═══════════════════════════════
-function openAddModal() {
-  currentForm = {priority:'',location:'',type:'',delayType:'',delayReason:''};
-  document.getElementById('taskName').value = '';
-  document.getElementById('taskDuration').value = '';
-  const now = new Date(); now.setMinutes(0,0,0); now.setHours(now.getHours()+1);
-  document.getElementById('taskDate').value = now.toISOString().slice(0,16);
-  document.querySelectorAll('#addModal .select-option').forEach(o=>o.classList.remove('selected'));
-  document.getElementById('addModal').classList.add('open');
+function processEvalQueue() {
+  const overlay = document.getElementById("evalOverlay");
+  if (overlay.classList.contains("show")) return;
+  if (AppState.evalQueue.length === 0) return;
+  const next = AppState.evalQueue.shift();
+  openEvaluationModal(next);
 }
 
-function openDelayModal(id) {
-  delayingTaskId = id;
-  currentForm.delayType = '';
-  currentForm.delayReason = '';
-  document.getElementById('delayNote').value = '';
-  document.getElementById('delayNewDate').value = '';
-  document.querySelectorAll('.delay-option').forEach(o=>o.classList.remove('selected'));
-  document.querySelectorAll('#delayModal .select-option').forEach(o=>o.classList.remove('selected'));
-  document.getElementById('delayModal').classList.add('open');
+/* ---------- 12. PROACTIVE AUDIO WARNINGS (10 minutes before) ---------- */
+function speakArabic(text) {
+  if (!("speechSynthesis" in window)) return;
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.lang = "ar-SA";
+  utter.rate = 0.95;
+  const voices = window.speechSynthesis.getVoices();
+  const arVoice = voices.find(v => v.lang && v.lang.toLowerCase().startsWith("ar"));
+  if (arVoice) utter.voice = arVoice;
+  window.speechSynthesis.speak(utter);
+}
+// prime the voices list (some browsers load it async)
+if ("speechSynthesis" in window) {
+  window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
 }
 
-function closeModal(id) { document.getElementById(id).classList.remove('open'); }
-
-function selectOpt(el, field, val) {
-  el.parentElement.querySelectorAll('.select-option').forEach(o=>o.classList.remove('selected'));
-  el.classList.add('selected');
-  currentForm[field] = val;
+function scanUpcomingReminders() {
+  const now = Date.now();
+  AppState.tasks.forEach(t => {
+    if (t.status === "delayed") return;
+    const startMs = new Date(t.start_time).getTime();
+    const diffMin = (startMs - now) / 60000;
+    // fire once when the task is between 9.5 and 10.5 minutes away
+    if (diffMin <= 10.5 && diffMin >= 9.5 && !AppState.notifiedTaskIds.has(String(t.id))) {
+      AppState.notifiedTaskIds.add(String(t.id));
+      const phrase = `تنبيه: متبقي عشر دقائق على موعد ${t.name}`;
+      speakArabic(phrase);
+      showToast("🔔 تذكير قادم", phrase, "warning");
+    }
+  });
 }
 
-function selectDelay(el, val) {
-  document.querySelectorAll('.delay-option').forEach(o=>o.classList.remove('selected'));
-  el.classList.add('selected');
-  currentForm.delayReason = val;
+/* ---------- 13. DELAYED ACCOUNTABILITY (10 minutes after end) ---------- */
+function scanPendingEvaluations() {
+  const now = Date.now();
+  AppState.tasks.forEach(t => {
+    if (t.status === "delayed") return;
+    if (AppState.evaluatedTaskIds.has(String(t.id))) return;
+    const endMs = new Date(t.end_time).getTime();
+    const diffMin = (now - endMs) / 60000;
+    if (diffMin >= 10) {
+      const alreadyQueued = AppState.evalQueue.some(q => String(q.id) === String(t.id));
+      const isActive = AppState.activeEvalTask && String(AppState.activeEvalTask.id) === String(t.id);
+      if (!alreadyQueued && !isActive) {
+        AppState.evalQueue.push(t);
+      }
+    }
+  });
+  processEvalQueue();
 }
 
-function showToast(msg, type='') {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = 'toast show' + (type ? ' '+type : '');
-  setTimeout(() => t.className='toast', 3500);
+/* ---------- 14. REPORTS & ANALYTICS ---------- */
+function renderReports() {
+  renderAxisBreakdown();
+  renderWeeklyChart();
 }
 
-document.querySelectorAll('.modal-overlay').forEach(overlay => {
-  overlay.addEventListener('click', e => { if(e.target===overlay) overlay.classList.remove('open'); });
-});
+function renderAxisBreakdown() {
+  const axes = ["Business", "Health", "Faith"];
+  const html = axes.map(axis => {
+    const logs = AppState.performance_logs.filter(p => p.axis_type === axis);
+    const avg = logs.length ? Math.round(logs.reduce((s, l) => s + (l.commitment_percentage || 0), 0) / logs.length) : 0;
+    return `<div class="axis-bar-row">
+      <div class="axis-bar-label"><span class="lbl-dot" style="background:${AXIS_COLORS[axis]}"></span>${AXIS_LABELS[axis]}</div>
+      <div class="axis-bar-track"><div class="axis-bar-fill" style="width:${avg}%; background:${AXIS_COLORS[axis]}"></div></div>
+      <div class="axis-bar-pct">${avg}%</div>
+    </div>`;
+  }).join("");
 
-init();
+  const weakest = axes.reduce((min, axis) => {
+    const logs = AppState.performance_logs.filter(p => p.axis_type === axis);
+    const avg = logs.length ? logs.reduce((s, l) => s + (l.commitment_percentage || 0), 0) / logs.length : 100;
+    return avg < min.avg ? { axis, avg } : min;
+  }, { axis: null, avg: 101 });
+
+  const insight = (weakest.axis && AppState.performance_logs.length > 0)
+    ? `<div class="hint" style="margin-top:14px; font-size:12.5px;">💡 أكبر خلل حالياً في محور <b style="color:var(--text)">${AXIS_LABELS[weakest.axis]}</b> — يستحق تركيزاً إضافياً هذا الأسبوع.</div>`
+    : `<div class="hint" style="margin-top:14px;">لا توجد بيانات تقييم كافية بعد لتحديد الخلل.</div>`;
+
+  document.getElementById("axisBreakdown").innerHTML = html + insight;
+}
+
+function renderWeeklyChart() {
+  const days = [];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    days.push(d);
+  }
+  const labels = days.map(d => d.toLocaleDateString("ar-SA", { weekday: "short" }));
+
+  const committedData = [];
+  const delayedData = [];
+  const notCommittedData = [];
+
+  days.forEach(day => {
+    const dayLogs = AppState.performance_logs.filter(l => isSameDay(l.logged_at, day));
+    const committed = dayLogs.filter(l => l.is_committed === true).length;
+    const notCommitted = dayLogs.filter(l => l.is_committed === false).length;
+    const dayDelays = AppState.delays.filter(d => isSameDay(d.new_time, day)).length;
+    committedData.push(committed);
+    notCommittedData.push(notCommitted);
+    delayedData.push(dayDelays);
+  });
+
+  const ctx = document.getElementById("weeklyChart").getContext("2d");
+  if (AppState.weeklyChartInstance) AppState.weeklyChartInstance.destroy();
+
+  AppState.weeklyChartInstance = new Chart(ctx, {
+    type: "bar",
+    data: {
+      labels,
+      datasets: [
+        { label: "التزام", data: committedData, backgroundColor: "#10b981", borderRadius: 6 },
+        { label: "تأجيل", data: delayedData, backgroundColor: "#f59e0b", borderRadius: 6 },
+        { label: "عدم التزام", data: notCommittedData, backgroundColor: "#ef4444", borderRadius: 6 }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { labels: { color: "#f5f5fa", font: { family: "Tajawal" } } } },
+      scales: {
+        x: { ticks: { color: "#9a9ab0", font: { family: "Tajawal" } }, grid: { color: "rgba(255,255,255,.05)" } },
+        y: { ticks: { color: "#9a9ab0", stepSize: 1 }, grid: { color: "rgba(255,255,255,.05)" }, beginAtZero: true }
+      }
+    }
+  });
+}
+
+/* ---------- 15. INIT ---------- */
+function initApp() {
+  document.getElementById("pageDate").textContent = formatDateLabel(new Date());
+  fetchAllData();
+  subscribeRealtime();
+
+  setInterval(scanUpcomingReminders, 30000);
+  setInterval(scanPendingEvaluations, 30000);
+
+  window.addEventListener("click", (e) => {
+    document.querySelectorAll(".overlay.show").forEach(ov => {
+      if (e.target === ov && !ov.classList.contains("locked")) ov.classList.remove("show");
+    });
+  });
+}
+
+document.addEventListener("DOMContentLoaded", initApp);
+
 </script>
 </body>
 </html>
