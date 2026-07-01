@@ -662,8 +662,8 @@ input[type=range]::-webkit-slider-thumb{
    2) اذهب إلى Project Settings > API
    3) انسخ "Project URL" و "anon public key" وضعهما هنا
 ------------------------------------------------- */
-const SUPABASE_URL = "https://YOUR-PROJECT-REF.supabase.co";
-const SUPABASE_ANON_KEY = "YOUR-SUPABASE-ANON-KEY";
+const SUPABASE_URL = "https://zwpjyrsnyqsokuhtfkwv.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp3cGp5cnNueXFzb2t1aHRma3d2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI1Nzg0MTYsImV4cCI6MjA5ODE1NDQxNn0.CuBingDnPVUo7gHljg7xpNzFilbnM9cqI3IaWY7B_2M";
 
 // خرائط أسماء الجداول الفعلية في قاعدة البيانات — تستخدم بادئة los_ لتفادي
 // أي تعارض مع جداول موجودة مسبقاً في نفس مشروع Supabase (مثل تطبيقات أخرى لديك)
@@ -678,7 +678,7 @@ let supabaseClient = null;
 let isSupabaseConfigured = false;
 
 try {
-  if (!SUPABASE_URL.includes("YOUR-PROJECT-REF") && !SUPABASE_ANON_KEY.includes("YOUR-SUPABASE-ANON-KEY")) {
+  if (!SUPABASE_URL.includes("") && !SUPABASE_ANON_KEY.includes("YOUR-SUPABASE-ANON-KEY")) {
     supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     isSupabaseConfigured = true;
   }
@@ -1402,7 +1402,7 @@ function renderAxisBreakdown() {
 }
 
 function renderWeeklyChart() {
-  const days = [];
+  const days = [];eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp3cGp5cnNueXFzb2t1aHRma3d2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI1Nzg0MTYsImV4cCI6MjA5ODE1NDQxNn0.CuBingDnPVUo7gHljg7xpNzFilbnM9cqI3IaWY7B_2M
   for (let i = 6; i >= 0; i--) {
     const d = new Date();
     d.setDate(d.getDate() - i);
