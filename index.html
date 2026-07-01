@@ -678,7 +678,7 @@ let supabaseClient = null;
 let isSupabaseConfigured = false;
 
 try {
-  if (!SUPABASE_URL.includes("") && !SUPABASE_ANON_KEY.includes("YOUR-SUPABASE-ANON-KEY")) {
+  if (!SUPABASE_URL.includes("YOUR-PROJECT-REF") && !SUPABASE_ANON_KEY.includes("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp3cGp5cnNueXFzb2t1aHRma3d2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI1Nzg0MTYsImV4cCI6MjA5ODE1NDQxNn0.CuBingDnPVUo7gHljg7xpNzFilbnM9cqI3IaWY7B_2M")) {
     supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     isSupabaseConfigured = true;
   }
