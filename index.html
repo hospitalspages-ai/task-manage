@@ -177,6 +177,26 @@ input,select,textarea{font-family:inherit;}
 .empty-state .e-icon{font-size:34px; margin-bottom:10px;}
 .empty-state .e-title{color:var(--text-dim); font-weight:700; font-size:15px; margin-bottom:4px;}
 
+/* Task bank */
+.bank-card{
+  background:var(--card); border:1px solid var(--border); border-radius:var(--radius-sm);
+  padding:16px 18px; display:flex; align-items:center; gap:16px;
+  border-inline-start:3px solid var(--axis-color, var(--accent));
+}
+.bank-card .bank-body{flex:1; min-width:0;}
+.bank-deadline{font-size:11.5px; color:var(--text-faint); margin-top:6px;}
+.bank-deadline.overdue{color:#fca5a5; font-weight:700;}
+.bank-picker{border:1px solid var(--border); border-radius:12px; margin:-6px 0 16px; max-height:220px; overflow-y:auto; display:none;}
+.bank-picker.show{display:block;}
+.bank-picker-item{padding:11px 14px; border-bottom:1px solid var(--border); font-size:13px; display:flex; justify-content:space-between; align-items:center; gap:10px;}
+.bank-picker-item:last-child{border-bottom:none;}
+.bank-picker-item:hover{background:rgba(255,255,255,.04);}
+.bank-toggle-btn{
+  width:100%; padding:10px; border-radius:11px; border:1px dashed var(--border); background:transparent;
+  color:var(--accent); font-size:13px; font-weight:700; margin-bottom:16px;
+}
+.bank-toggle-btn:hover{background:var(--accent-soft);}
+
 /* ============================================================
    MODALS
 ============================================================ */
@@ -358,6 +378,13 @@ input[type=range]::-webkit-slider-thumb{
     </div>
 
     <div class="nav-group">
+      <div class="nav-label">التخطيط</div>
+      <button class="nav-item" data-view="bank" onclick="setView('bank')">
+        <span class="dot"></span> بنك المهام
+      </button>
+    </div>
+
+    <div class="nav-group">
       <div class="nav-label">التحليل</div>
       <button class="nav-item" data-view="reports" onclick="setView('reports')">
         <span class="dot"></span> التقارير وتحليل الخلل
@@ -398,6 +425,15 @@ input[type=range]::-webkit-slider-thumb{
       <div class="task-list" id="taskList"></div>
     </div>
 
+    <!-- TASK BANK VIEW -->
+    <div id="view-bank" style="display:none;">
+      <div class="topbar" style="margin-bottom:18px;">
+        <div class="date-sub">مهام محفوظة بانتظار جدولتها عند توفر الوقت المناسب</div>
+        <button class="btn btn-primary" onclick="openBankModal()">＋ إضافة للبنك</button>
+      </div>
+      <div class="task-list" id="bankList"></div>
+    </div>
+
     <!-- REPORTS VIEW -->
     <div id="view-reports" style="display:none;">
       <div class="report-section">
@@ -425,6 +461,10 @@ input[type=range]::-webkit-slider-thumb{
     </div>
     <div class="modal-body">
       <input type="hidden" id="f_id">
+      <input type="hidden" id="f_bank_id" value="">
+
+      <button type="button" class="bank-toggle-btn" onclick="toggleBankPicker()">📚 اختر من بنك المهام بدلاً من الإدخال اليدوي</button>
+      <div class="bank-picker" id="bankPicker"></div>
 
       <div class="form-row">
         <label>المحور</label>
@@ -531,6 +571,58 @@ input[type=range]::-webkit-slider-thumb{
 </div>
 
 <!-- ============================================================
+     TASK BANK ADD MODAL
+============================================================ -->
+<div class="overlay" id="bankOverlay">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>📚 إضافة مهمة لبنك المهام</h3>
+      <button class="modal-close" onclick="closeModal('bankOverlay')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <label>المحور</label>
+        <div class="axis-select" id="bankAxisSelect">
+          <button type="button" class="axis-opt sel" data-axis="Business" onclick="chooseBankAxis('Business')"><span class="a-ico">💼</span>الأعمال</button>
+          <button type="button" class="axis-opt" data-axis="Health" onclick="chooseBankAxis('Health')"><span class="a-ico">🥗</span>الصحة</button>
+          <button type="button" class="axis-opt" data-axis="Faith" onclick="chooseBankAxis('Faith')"><span class="a-ico">🕌</span>العبادة</button>
+        </div>
+      </div>
+      <div class="form-row">
+        <label>اسم المهمة</label>
+        <input type="text" id="bk_name" placeholder="مثال: مراجعة العقد القانوني">
+      </div>
+      <div class="form-grid">
+        <div class="form-row">
+          <label>مدة الإنجاز المتوقعة (بالدقائق)</label>
+          <input type="number" id="bk_duration" min="5" step="5" value="30">
+        </div>
+        <div class="form-row">
+          <label>درجة الأهمية</label>
+          <select id="bk_priority">
+            <option value="Max">أقصى أولوية</option>
+            <option value="Medium" selected>متوسطة</option>
+            <option value="Normal">عادية</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <label>آخر مهلة للإنجاز (اختياري)</label>
+        <input type="datetime-local" id="bk_deadline">
+      </div>
+      <div class="form-row">
+        <label>ملاحظات</label>
+        <textarea id="bk_notes" placeholder="أي تفاصيل إضافية..."></textarea>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal('bankOverlay')">إلغاء</button>
+      <button class="btn btn-primary" onclick="submitBankTask()">حفظ في البنك</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
      CONFLICT ALERT MODAL
 ============================================================ -->
 <div class="overlay" id="conflictOverlay">
@@ -568,6 +660,7 @@ input[type=range]::-webkit-slider-thumb{
         <div class="tc-name" id="delayTaskName">—</div>
         <div class="tc-time" id="delayTaskTime">—</div>
       </div>
+      <div class="hint" id="delayAttemptsHint" style="margin-bottom:14px; text-align:center;"></div>
       <div class="form-row">
         <label>سبب التأجيل</label>
         <div class="reason-grid" id="delayReasons">
@@ -671,14 +764,15 @@ const TABLE_MAP = {
   tasks: "los_tasks",
   diet_items: "los_diet_items",
   performance_logs: "los_performance_logs",
-  delays: "los_delays"
+  delays: "los_delays",
+  task_bank: "los_task_bank"
 };
 
 let supabaseClient = null;
 let isSupabaseConfigured = false;
 
 try {
-  if (!SUPABASE_URL.includes("YOUR-PROJECT-REF") && !SUPABASE_ANON_KEY.includes("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp3cGp5cnNueXFzb2t1aHRma3d2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI1Nzg0MTYsImV4cCI6MjA5ODE1NDQxNn0.CuBingDnPVUo7gHljg7xpNzFilbnM9cqI3IaWY7B_2M")) {
+  if (!SUPABASE_URL.includes("YOUR-PROJECT-REF") && !SUPABASE_ANON_KEY.includes("YOUR-SUPABASE-ANON-KEY")) {
     supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     isSupabaseConfigured = true;
   }
@@ -692,10 +786,12 @@ const AppState = {
   diet_items: [],        // all diet items
   performance_logs: [],  // all performance logs
   delays: [],             // all delay records
+  task_bank: [],           // all task-bank entries
   currentView: "dashboard",
   currentAxis: "all",
   currentDayFilter: "today",
   selectedAxisInForm: "Business",
+  selectedBankAxis: "Business",
   ingredientCounter: 0,
   activeDelayTaskId: null,
   activeEvalTask: null,
@@ -755,6 +851,29 @@ function showToast(title, msg, type = "success") {
 function openModal(id) { document.getElementById(id).classList.add("show"); }
 function closeModal(id) { document.getElementById(id).classList.remove("show"); }
 
+/* ---------- 3b. SOUND ALERTS ----------
+   صوت بشري (تحويل نص لكلام): يُستخدم حصراً لتنبيه العشر دقائق قبل موعد المهمة.
+   جرس تنبيه: يُستخدم لكل التنبيهات الأخرى (رسالة تقييم، نقل تلقائي لبنك المهام...).
+------------------------------------------------- */
+function playBellSound() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const now = ctx.currentTime;
+    [880, 1320].forEach((freq, i) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "sine";
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(0.0001, now + i * 0.18);
+      gain.gain.exponentialRampToValueAtTime(0.22, now + i * 0.18 + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + i * 0.18 + 0.5);
+      osc.connect(gain).connect(ctx.destination);
+      osc.start(now + i * 0.18);
+      osc.stop(now + i * 0.18 + 0.55);
+    });
+  } catch (e) { console.warn("Bell sound failed:", e); }
+}
+
 /* ---------- 4. SUPABASE / LOCAL FALLBACK DATA LAYER ---------- */
 async function fetchAllData() {
   if (!isSupabaseConfigured) {
@@ -763,17 +882,19 @@ async function fetchAllData() {
     return;
   }
   try {
-    const [tasksRes, dietRes, perfRes, delaysRes] = await Promise.all([
+    const [tasksRes, dietRes, perfRes, delaysRes, bankRes] = await Promise.all([
       supabaseClient.from(TABLE_MAP.tasks).select("*").order("start_time", { ascending: true }),
       supabaseClient.from(TABLE_MAP.diet_items).select("*"),
       supabaseClient.from(TABLE_MAP.performance_logs).select("*"),
-      supabaseClient.from(TABLE_MAP.delays).select("*")
+      supabaseClient.from(TABLE_MAP.delays).select("*"),
+      supabaseClient.from(TABLE_MAP.task_bank).select("*").order("created_at", { ascending: false })
     ]);
     if (tasksRes.error) throw tasksRes.error;
     AppState.tasks = tasksRes.data || [];
     AppState.diet_items = dietRes.data || [];
     AppState.performance_logs = perfRes.data || [];
     AppState.delays = delaysRes.data || [];
+    AppState.task_bank = bankRes.data || [];
     AppState.evaluatedTaskIds = new Set(AppState.performance_logs.map(p => String(p.task_id)));
     updateSyncPill(true, "متصل ومتزامن مع Supabase");
     renderAll();
@@ -798,6 +919,7 @@ function subscribeRealtime() {
     .on("postgres_changes", { event: "*", schema: "public", table: TABLE_MAP.performance_logs }, () => fetchAllData())
     .on("postgres_changes", { event: "*", schema: "public", table: TABLE_MAP.delays }, () => fetchAllData())
     .on("postgres_changes", { event: "*", schema: "public", table: TABLE_MAP.diet_items }, () => fetchAllData())
+    .on("postgres_changes", { event: "*", schema: "public", table: TABLE_MAP.task_bank }, () => fetchAllData())
     .subscribe();
 }
 
@@ -843,14 +965,18 @@ function setView(view, axis) {
   if (navEl) navEl.classList.add("active");
 
   document.getElementById("view-dashboard").style.display = view === "dashboard" ? "block" : "none";
+  document.getElementById("view-bank").style.display = view === "bank" ? "block" : "none";
   document.getElementById("view-reports").style.display = view === "reports" ? "block" : "none";
 
   const titles = { all: "نظرة عامة", Business: "إدارة الأعمال اليومية", Health: "إدارة الصحة", Faith: "إدارة العبادة" };
-  document.getElementById("pageTitle").textContent = view === "reports" ? "التقارير وتحليل الخلل" : (titles[axis] || "نظرة عامة");
+  document.getElementById("pageTitle").textContent =
+    view === "reports" ? "التقارير وتحليل الخلل" :
+    view === "bank" ? "بنك المهام" :
+    (titles[axis] || "نظرة عامة");
 
   if (window.innerWidth <= 900) document.getElementById("sidebar").classList.remove("open");
 
-  if (view === "reports") { renderReports(); } else { renderDashboard(); }
+  if (view === "reports") { renderReports(); } else if (view === "bank") { renderBank(); } else { renderDashboard(); }
 }
 
 function setDayFilter(f) {
@@ -864,6 +990,7 @@ function renderAll() {
   document.getElementById("pageDate").textContent = formatDateLabel(new Date());
   renderDashboard();
   if (AppState.currentView === "reports") renderReports();
+  if (AppState.currentView === "bank") renderBank();
 }
 
 function getFilteredTasks() {
@@ -912,6 +1039,7 @@ function taskCardHTML(t) {
     metaBits += `<span>🧠 ${MODE_LABELS[t.mental_mode] || t.mental_mode || "—"}</span>`;
   }
   metaBits += `<span>🔁 ${RECURRENCE_LABELS[t.recurrence] || t.recurrence}</span>`;
+  if (t.delay_count) metaBits += `<span>⏳ تأجيل ${t.delay_count}/3</span>`;
 
   const priorityBadge = t.priority ? `<span class="badge badge-priority-${t.priority}">${PRIORITY_LABELS[t.priority] || t.priority}</span>` : "";
   const statusBadge = isDelayed ? `<span class="badge badge-status">مؤجّلة</span>` : (evaluated ? `<span class="badge badge-status">تم التقييم</span>` : "");
@@ -959,10 +1087,150 @@ function renderStatRow() {
   document.getElementById("statRow").innerHTML = html;
 }
 
+/* ---------- 6b. TASK BANK RENDER / ACTIONS ---------- */
+function renderBank() {
+  const container = document.getElementById("bankList");
+  if (!AppState.task_bank.length) {
+    container.innerHTML = `<div class="empty-state">
+      <div class="e-icon">📚</div>
+      <div class="e-title">بنك المهام فارغ</div>
+      <div>أضف مهام هنا لجدولتها لاحقاً عند توفر الوقت المناسب</div>
+    </div>`;
+    return;
+  }
+  container.innerHTML = AppState.task_bank.map(bankCardHTML).join("");
+}
+
+function bankCardHTML(b) {
+  const axisColor = AXIS_COLORS[b.axis_type] || "var(--accent)";
+  let deadlineHtml = "بدون مهلة محددة";
+  let overdueClass = "";
+  if (b.deadline) {
+    deadlineHtml = "آخر مهلة: " + formatDateLabel(b.deadline) + " — " + formatTime(b.deadline);
+    if (new Date(b.deadline) < new Date()) overdueClass = "overdue";
+  }
+  return `
+  <div class="bank-card" style="--axis-color:${axisColor}">
+    <div class="bank-body">
+      <div class="task-name">
+        ${escapeHtml(b.name)}
+        <span class="badge badge-axis-${b.axis_type}">${AXIS_LABELS[b.axis_type]}</span>
+        <span class="badge badge-priority-${b.priority}">${PRIORITY_LABELS[b.priority] || b.priority}</span>
+      </div>
+      <div class="bank-deadline ${overdueClass}">⏱ ${b.estimated_duration} د متوقعة${b.notes ? " — " + escapeHtml(b.notes) : ""}</div>
+      <div class="bank-deadline ${overdueClass}">📅 ${deadlineHtml}</div>
+    </div>
+    <div class="task-actions">
+      <button class="icon-btn" title="جدولة الآن" onclick="scheduleFromBank('${b.id}')">📅</button>
+      <button class="icon-btn danger" title="حذف من البنك" onclick="deleteBankTask('${b.id}')">🗑</button>
+    </div>
+  </div>`;
+}
+
+function openBankModal() {
+  document.getElementById("bk_name").value = "";
+  document.getElementById("bk_duration").value = 30;
+  document.getElementById("bk_priority").value = "Medium";
+  document.getElementById("bk_deadline").value = "";
+  document.getElementById("bk_notes").value = "";
+  chooseBankAxis("Business");
+  openModal("bankOverlay");
+}
+
+function chooseBankAxis(axis) {
+  AppState.selectedBankAxis = axis;
+  document.querySelectorAll("#bankAxisSelect .axis-opt").forEach(el => el.classList.toggle("sel", el.dataset.axis === axis));
+}
+
+async function submitBankTask() {
+  const name = document.getElementById("bk_name").value.trim();
+  const duration = parseInt(document.getElementById("bk_duration").value || "0", 10);
+  if (!name || !duration) {
+    showToast("بيانات ناقصة", "يرجى إدخال اسم المهمة والمدة المتوقعة", "danger");
+    return;
+  }
+  const deadlineVal = document.getElementById("bk_deadline").value;
+  await dbInsert("task_bank", {
+    name,
+    axis_type: AppState.selectedBankAxis,
+    priority: document.getElementById("bk_priority").value,
+    estimated_duration: duration,
+    deadline: deadlineVal ? new Date(deadlineVal).toISOString() : null,
+    notes: document.getElementById("bk_notes").value.trim(),
+    created_at: new Date().toISOString()
+  });
+  showToast("تم الحفظ", "تمت إضافة المهمة إلى بنك المهام", "success");
+  closeModal("bankOverlay");
+  fetchAllData();
+}
+
+async function deleteBankTask(id) {
+  if (!confirm("هل تريد حذف هذه المهمة من البنك؟")) return;
+  await dbDelete("task_bank", id);
+  showToast("تم الحذف", "تم حذف المهمة من البنك", "success");
+  fetchAllData();
+}
+
+function toggleBankPicker() {
+  const picker = document.getElementById("bankPicker");
+  if (picker.classList.contains("show")) { picker.classList.remove("show"); return; }
+  if (!AppState.task_bank.length) {
+    picker.innerHTML = `<div class="bank-picker-item" style="justify-content:center; color:var(--text-faint);">بنك المهام فارغ حالياً</div>`;
+  } else {
+    picker.innerHTML = AppState.task_bank.map(b => `
+      <div class="bank-picker-item" onclick="useBankTask('${b.id}')" style="cursor:pointer;">
+        <span>${escapeHtml(b.name)}</span>
+        <span class="badge badge-axis-${b.axis_type}">${AXIS_LABELS[b.axis_type]}</span>
+      </div>`).join("");
+  }
+  picker.classList.add("show");
+}
+
+function useBankTask(bankId) {
+  const b = AppState.task_bank.find(x => String(x.id) === String(bankId));
+  if (!b) return;
+  document.getElementById("f_bank_id").value = b.id;
+  chooseAxis(b.axis_type);
+  if (b.axis_type !== "Health") {
+    document.getElementById("f_name").value = b.name;
+    document.getElementById("f_priority").value = b.priority || "Medium";
+  }
+  document.getElementById("f_duration").value = b.estimated_duration || 30;
+  document.getElementById("f_notes").value = b.notes || "";
+  recalcEndTime();
+  document.getElementById("bankPicker").classList.remove("show");
+  showToast("تم الاختيار", "تم تعبئة النموذج من بنك المهام، أكمل تحديد الوقت واحفظ", "success");
+}
+
+function scheduleFromBank(bankId) {
+  openTaskModal();
+  setTimeout(() => useBankTask(bankId), 30);
+}
+
+async function moveTaskToBank(t) {
+  await dbInsert("task_bank", {
+    name: t.name,
+    axis_type: t.axis_type,
+    priority: t.priority || "Normal",
+    estimated_duration: t.duration,
+    deadline: null,
+    notes: (t.notes ? t.notes + " — " : "") + "تم نقلها تلقائياً بعد تأجيلها 3 مرات دون تنفيذ",
+    created_at: new Date().toISOString()
+  });
+  const items = AppState.diet_items.filter(d => String(d.task_id) === String(t.id));
+  for (const item of items) await dbDelete("diet_items", item.id);
+  await dbDelete("tasks", t.id);
+  playBellSound();
+  showToast("نُقلت لبنك المهام", `تم نقل مهمة "${t.name}" تلقائياً إلى بنك المهام بعد تكرار التأجيل`, "warning");
+  fetchAllData();
+}
+
 /* ---------- 7. TASK FORM: OPEN / AXIS SWITCH / INGREDIENTS ---------- */
 function openTaskModal(taskId) {
   document.getElementById("taskModalTitle").textContent = taskId ? "تعديل المهمة" : "إضافة مهمة جديدة";
   document.getElementById("f_id").value = taskId || "";
+  document.getElementById("f_bank_id").value = "";
+  document.getElementById("bankPicker").classList.remove("show");
   document.getElementById("f_name").value = "";
   document.getElementById("f_notes").value = "";
   document.getElementById("f_priority").value = "Medium";
@@ -985,7 +1253,7 @@ function openTaskModal(taskId) {
 
 function chooseAxis(axis) {
   AppState.selectedAxisInForm = axis;
-  document.querySelectorAll(".axis-opt").forEach(el => el.classList.toggle("sel", el.dataset.axis === axis));
+  document.querySelectorAll("#axisSelect .axis-opt").forEach(el => el.classList.toggle("sel", el.dataset.axis === axis));
   const isHealth = axis === "Health";
   document.getElementById("standardFields").style.display = isHealth ? "none" : "block";
   document.getElementById("healthFields").style.display = isHealth ? "block" : "none";
@@ -1050,6 +1318,7 @@ async function submitTask() {
   const start = new Date(startVal);
   const end = new Date(start.getTime() + duration * 60000);
   const editingId = document.getElementById("f_id").value || null;
+  const bankId = document.getElementById("f_bank_id").value || null;
 
   let name, mealType = null, ingredients = [];
   if (axis === "Health") {
@@ -1095,6 +1364,7 @@ async function submitTask() {
     notes: document.getElementById("f_notes").value.trim(),
     status: "pending"
   };
+  if (!editingId) payload.delay_count = 0;
 
   try {
     let taskRow;
@@ -1115,9 +1385,13 @@ async function submitTask() {
       }
     }
 
+    if (bankId) {
+      await dbDelete("task_bank", bankId);
+    }
+
     showToast("تم الحفظ", "تم حفظ المهمة بنجاح", "success");
     closeModal("taskOverlay");
-    if (!isSupabaseConfigured) fetchAllData(); else fetchAllData();
+    fetchAllData();
   } catch (e) {
     console.error(e);
   }
@@ -1171,6 +1445,12 @@ function openDelayModal(taskId) {
   document.getElementById("delayTaskName").textContent = t.name;
   document.getElementById("delayTaskTime").textContent = formatTime(t.start_time) + " — " + formatTime(t.end_time);
 
+  const currentDelayCount = t.delay_count || 0;
+  const remaining = 3 - currentDelayCount;
+  document.getElementById("delayAttemptsHint").textContent = remaining > 0
+    ? `تنبيه: تبقى ${remaining} تأجيل قبل نقل المهمة تلقائياً إلى بنك المهام.`
+    : `تنبيه: هذا هو التأجيل الرابع — عند التأكيد ستُنقل المهمة مباشرة إلى بنك المهام بدل تحديد وقت جديد.`;
+
   const newStart = new Date(Date.now() + 30 * 60000);
   document.getElementById("delayNewTime").value = toLocalDatetimeInputValue(newStart);
   openModal("delayOverlay");
@@ -1186,6 +1466,15 @@ async function submitDelay() {
   const taskId = AppState.activeDelayTaskId;
   const t = AppState.tasks.find(t => String(t.id) === String(taskId));
   if (!t) return;
+
+  const currentDelayCount = t.delay_count || 0;
+
+  // بعد 3 تأجيلات سابقة: أي محاولة تأجيل رابعة تُنقل المهمة تلقائياً لبنك المهام
+  if (currentDelayCount >= 3) {
+    await moveTaskToBank(t);
+    closeModal("delayOverlay");
+    return;
+  }
 
   const note = document.getElementById("delayNote").value.trim();
   const reason = selectedDelayReason || (note ? "سبب مخصص" : null);
@@ -1210,12 +1499,14 @@ async function submitDelay() {
     original_time: t.start_time, new_time: newStart.toISOString()
   });
 
+  const newDelayCount = currentDelayCount + 1;
   await dbUpdate("tasks", t.id, {
-    start_time: newStart.toISOString(), end_time: newEnd.toISOString(), status: "delayed"
+    start_time: newStart.toISOString(), end_time: newEnd.toISOString(), status: "delayed",
+    delay_count: newDelayCount
   });
 
   AppState.notifiedTaskIds.delete(String(t.id));
-  showToast("تم التأجيل", "تم تحديث موعد المهمة بنجاح", "success");
+  showToast("تم التأجيل", `تم تحديث موعد المهمة (تأجيل رقم ${newDelayCount} من 3 قبل نقلها تلقائياً لبنك المهام)`, "success");
   closeModal("delayOverlay");
   fetchAllData();
 }
@@ -1238,6 +1529,8 @@ function setEvalGramsCommit(val) {
 }
 
 function openEvaluationModal(task) {
+  playBellSound();
+
   AppState.activeEvalTask = task;
   AppState.evalCommit = null;
   AppState.evalMealCommit = null;
@@ -1295,7 +1588,8 @@ async function submitEvaluation() {
     const clone = await dbInsert("tasks", {
       name: task.name, axis_type: task.axis_type, priority: task.priority, duration: task.duration,
       start_time: nextStart.toISOString(), end_time: nextEnd.toISOString(), recurrence: task.recurrence,
-      location: task.location, mental_mode: task.mental_mode, notes: task.notes, status: "pending"
+      location: task.location, mental_mode: task.mental_mode, notes: task.notes, status: "pending",
+      delay_count: 0
     });
     if (task.axis_type === "Health") {
       const items = AppState.diet_items.filter(d => String(d.task_id) === String(task.id));
@@ -1345,7 +1639,7 @@ function scanUpcomingReminders() {
     if (diffMin <= 10.5 && diffMin >= 9.5 && !AppState.notifiedTaskIds.has(String(t.id))) {
       AppState.notifiedTaskIds.add(String(t.id));
       const phrase = `تنبيه: متبقي عشر دقائق على موعد ${t.name}`;
-      speakArabic(phrase);
+      speakArabic(phrase); // صوت بشري حصراً لهذا التذكير
       showToast("🔔 تذكير قادم", phrase, "warning");
     }
   });
@@ -1402,7 +1696,7 @@ function renderAxisBreakdown() {
 }
 
 function renderWeeklyChart() {
-  const days = [];eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp3cGp5cnNueXFzb2t1aHRma3d2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI1Nzg0MTYsImV4cCI6MjA5ODE1NDQxNn0.CuBingDnPVUo7gHljg7xpNzFilbnM9cqI3IaWY7B_2M
+  const days = [];
   for (let i = 6; i >= 0; i--) {
     const d = new Date();
     d.setDate(d.getDate() - i);
