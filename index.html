@@ -14,23 +14,23 @@
    TOKENS — Luxury Dark Slate
 ============================================================ */
 :root{
-  --bg:#05050a; --bg2:#0d0d1a; --card:#121226; --accent:#6c63ff;
-  --accent-soft: rgba(108,99,255,.14);
-  --success:#10b981; --success-soft: rgba(16,185,129,.14);
-  --warning:#f59e0b; --warning-soft: rgba(245,158,11,.14);
-  --danger:#ef4444; --danger-soft: rgba(239,68,68,.14);
-  --text:#f5f5fa; --text-dim:#9a9ab0; --text-faint:#5c5c74;
-  --border:#1f1f3d;
+  --bg:#fdf3ee; --bg2:#fff5f8; --card:#ffffff; --accent:#d1699b;
+  --accent-soft: rgba(209,105,155,.14);
+  --success:#4caf7d; --success-soft: rgba(76,175,125,.14);
+  --warning:#d99a3f; --warning-soft: rgba(217,154,63,.14);
+  --danger:#e0616f; --danger-soft: rgba(224,97,111,.14);
+  --text:#4a3b3f; --text-dim:#8a7680; --text-faint:#c9b8bf;
+  --border:#f0d9e0;
   --radius:18px; --radius-sm:12px;
-  --shadow: 0 20px 60px -20px rgba(0,0,0,.6);
-  --axis-business:#6c63ff; --axis-health:#10b981; --axis-faith:#f59e0b;
+  --shadow: 0 20px 50px -28px rgba(178,120,140,.35);
+  --axis-business:#d1699b; --axis-health:#4caf7d; --axis-faith:#d99a3f;
 }
 *{box-sizing:border-box; margin:0; padding:0;}
 html,body{height:100%;}
 body{
   background:
-    radial-gradient(1200px 600px at 85% -10%, rgba(108,99,255,.10), transparent 60%),
-    radial-gradient(900px 500px at -10% 110%, rgba(16,185,129,.08), transparent 60%),
+    radial-gradient(1200px 600px at 85% -10%, rgba(209,105,155,.12), transparent 60%),
+    radial-gradient(900px 500px at -10% 110%, rgba(76,175,125,.10), transparent 60%),
     var(--bg);
   color:var(--text);
   font-family:'Tajawal', sans-serif;
@@ -61,9 +61,9 @@ input,select,textarea{font-family:inherit;}
 .brand{display:flex; align-items:center; gap:12px; padding:0 4px;}
 .brand-mark{
   width:40px; height:40px; border-radius:12px;
-  background:linear-gradient(135deg, var(--accent), #4338ca);
+  background:linear-gradient(135deg, var(--accent), #a13d70);
   display:flex; align-items:center; justify-content:center;
-  font-size:20px; box-shadow:0 8px 20px -6px rgba(108,99,255,.6);
+  font-size:20px; box-shadow:0 8px 20px -6px rgba(209,105,155,.45);
 }
 .brand-text{font-size:17px; font-weight:800; line-height:1.15;}
 .brand-sub{font-size:11px; color:var(--text-faint); font-weight:400; letter-spacing:.3px;}
@@ -76,16 +76,16 @@ input,select,textarea{font-family:inherit;}
   transition:.15s ease;
 }
 .nav-item .dot{width:8px; height:8px; border-radius:50%; background:var(--text-faint); flex-shrink:0; transition:.15s;}
-.nav-item:hover{background:rgba(255,255,255,.03); color:var(--text);}
+.nav-item:hover{background:rgba(178,120,140,.03); color:var(--text);}
 .nav-item.active{background:var(--accent-soft); color:var(--text);}
-.nav-item.active .dot{background:var(--accent); box-shadow:0 0 0 4px rgba(108,99,255,.18);}
+.nav-item.active .dot{background:var(--accent); box-shadow:0 0 0 4px rgba(209,105,155,.18);}
 .nav-item[data-axis="Health"].active .dot{background:var(--success); box-shadow:0 0 0 4px rgba(16,185,129,.18);}
 .nav-item[data-axis="Faith"].active .dot{background:var(--warning); box-shadow:0 0 0 4px rgba(245,158,11,.18);}
 
 .sidebar-foot{margin-top:auto; display:flex; flex-direction:column; gap:10px;}
 .sync-pill{
   display:flex; align-items:center; gap:8px; font-size:11.5px; color:var(--text-faint);
-  padding:9px 12px; border:1px solid var(--border); border-radius:10px; background:rgba(255,255,255,.015);
+  padding:9px 12px; border:1px solid var(--border); border-radius:10px; background:rgba(178,120,140,.015);
 }
 .sync-pill .led{width:7px; height:7px; border-radius:50%; background:var(--text-faint);}
 .sync-pill.online .led{background:var(--success); box-shadow:0 0 8px var(--success);}
@@ -100,10 +100,10 @@ input,select,textarea{font-family:inherit;}
   display:inline-flex; align-items:center; gap:8px; border:none; border-radius:12px;
   padding:11px 18px; font-size:14px; font-weight:700; transition:.15s ease; white-space:nowrap;
 }
-.btn-primary{background:linear-gradient(135deg, var(--accent), #5750d6); color:#fff; box-shadow:0 10px 24px -8px rgba(108,99,255,.55);}
-.btn-primary:hover{transform:translateY(-1px); box-shadow:0 14px 28px -8px rgba(108,99,255,.7);}
-.btn-ghost{background:rgba(255,255,255,.04); color:var(--text); border:1px solid var(--border);}
-.btn-ghost:hover{background:rgba(255,255,255,.08);}
+.btn-primary{background:linear-gradient(135deg, var(--accent), #a13d70); color:#fff; box-shadow:0 10px 24px -8px rgba(209,105,155,.45);}
+.btn-primary:hover{transform:translateY(-1px); box-shadow:0 14px 28px -8px rgba(209,105,155,.55);}
+.btn-ghost{background:rgba(178,120,140,.04); color:var(--text); border:1px solid var(--border);}
+.btn-ghost:hover{background:rgba(178,120,140,.08);}
 .btn-danger{background:var(--danger-soft); color:#fca5a5;}
 .btn-sm{padding:8px 12px; font-size:12.5px; border-radius:9px;}
 
@@ -119,16 +119,16 @@ input,select,textarea{font-family:inherit;}
 .stat-card.faith{--accent-line:var(--axis-faith);}
 .stat-label{font-size:12px; color:var(--text-dim); font-weight:500; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;}
 .stat-num{font-size:26px; font-weight:800;}
-.stat-bar{height:5px; border-radius:4px; background:rgba(255,255,255,.06); margin-top:12px; overflow:hidden;}
+.stat-bar{height:5px; border-radius:4px; background:rgba(178,120,140,.06); margin-top:12px; overflow:hidden;}
 .stat-bar > div{height:100%; border-radius:4px; background:var(--accent-line, var(--accent)); transition:width .5s ease;}
 
 /* Filter chips */
 .filters{display:flex; gap:8px; margin-bottom:18px; flex-wrap:wrap;}
 .chip{
   padding:8px 16px; border-radius:999px; font-size:13px; font-weight:600;
-  background:rgba(255,255,255,.04); color:var(--text-dim); border:1px solid var(--border); transition:.15s;
+  background:rgba(178,120,140,.04); color:var(--text-dim); border:1px solid var(--border); transition:.15s;
 }
-.chip:hover{background:rgba(255,255,255,.07);}
+.chip:hover{background:rgba(178,120,140,.07);}
 .chip.active{background:var(--accent); color:#fff; border-color:var(--accent);}
 .chip.active[data-chip="Health"]{background:var(--success);}
 .chip.active[data-chip="Faith"]{background:var(--warning);}
@@ -141,7 +141,7 @@ input,select,textarea{font-family:inherit;}
   border-inline-start:3px solid var(--axis-color, var(--accent));
   transition:.15s ease;
 }
-.task-card:hover{border-color:rgba(255,255,255,.14); transform:translateY(-1px);}
+.task-card:hover{border-color:rgba(178,120,140,.14); transform:translateY(-1px);}
 .task-card.status-delayed{opacity:.72;}
 .task-card.status-conflict{}
 .task-time{
@@ -153,21 +153,21 @@ input,select,textarea{font-family:inherit;}
 .task-body{flex:1; min-width:0;}
 .task-name{font-size:15px; font-weight:700; display:flex; align-items:center; gap:8px; flex-wrap:wrap;}
 .badge{font-size:10.5px; font-weight:700; padding:3px 9px; border-radius:999px; white-space:nowrap;}
-.badge-axis-Business{background:var(--accent-soft); color:#a8a2ff;}
-.badge-axis-Health{background:var(--success-soft); color:#6ee7b7;}
-.badge-axis-Faith{background:var(--warning-soft); color:#fcd34d;}
-.badge-priority-Max{background:var(--danger-soft); color:#fca5a5;}
-.badge-priority-Medium{background:var(--warning-soft); color:#fcd34d;}
-.badge-priority-Normal{background:rgba(255,255,255,.06); color:var(--text-dim);}
-.badge-status{background:rgba(255,255,255,.06); color:var(--text-dim);}
+.badge-axis-Business{background:var(--accent-soft); color:#a13d70;}
+.badge-axis-Health{background:var(--success-soft); color:#2f7a54;}
+.badge-axis-Faith{background:var(--warning-soft); color:#9c6b1f;}
+.badge-priority-Max{background:var(--danger-soft); color:#b83b48;}
+.badge-priority-Medium{background:var(--warning-soft); color:#9c6b1f;}
+.badge-priority-Normal{background:rgba(178,120,140,.06); color:var(--text-dim);}
+.badge-status{background:rgba(178,120,140,.06); color:var(--text-dim);}
 .task-meta{display:flex; gap:14px; flex-wrap:wrap; margin-top:6px; font-size:12px; color:var(--text-dim);}
 .task-meta span{display:flex; align-items:center; gap:5px;}
 .task-actions{display:flex; gap:8px; flex-shrink:0;}
 .icon-btn{
-  width:34px; height:34px; border-radius:10px; background:rgba(255,255,255,.04); border:1px solid var(--border);
+  width:34px; height:34px; border-radius:10px; background:rgba(178,120,140,.04); border:1px solid var(--border);
   display:flex; align-items:center; justify-content:center; font-size:14px; color:var(--text-dim); transition:.15s;
 }
-.icon-btn:hover{background:rgba(255,255,255,.09); color:var(--text);}
+.icon-btn:hover{background:rgba(178,120,140,.09); color:var(--text);}
 .icon-btn.danger:hover{background:var(--danger-soft); color:#fca5a5;}
 
 .empty-state{
@@ -190,7 +190,7 @@ input,select,textarea{font-family:inherit;}
 .bank-picker.show{display:block;}
 .bank-picker-item{padding:11px 14px; border-bottom:1px solid var(--border); font-size:13px; display:flex; justify-content:space-between; align-items:center; gap:10px;}
 .bank-picker-item:last-child{border-bottom:none;}
-.bank-picker-item:hover{background:rgba(255,255,255,.04);}
+.bank-picker-item:hover{background:rgba(178,120,140,.04);}
 .bank-toggle-btn{
   width:100%; padding:10px; border-radius:11px; border:1px dashed var(--border); background:transparent;
   color:var(--accent); font-size:13px; font-weight:700; margin-bottom:16px;
@@ -201,11 +201,11 @@ input,select,textarea{font-family:inherit;}
    MODALS
 ============================================================ */
 .overlay{
-  position:fixed; inset:0; background:rgba(2,2,6,.72); backdrop-filter:blur(6px);
+  position:fixed; inset:0; background:rgba(74,59,63,.45); backdrop-filter:blur(6px);
   display:none; align-items:center; justify-content:center; z-index:200; padding:20px;
 }
 .overlay.show{display:flex;}
-.overlay.locked{background:rgba(2,2,6,.86);}
+.overlay.locked{background:rgba(74,59,63,.6);}
 .modal{
   background:var(--bg2); border:1px solid var(--border); border-radius:20px;
   width:100%; max-width:520px; max-height:88vh; overflow-y:auto; box-shadow:var(--shadow);
@@ -218,8 +218,8 @@ input,select,textarea{font-family:inherit;}
   border-bottom:1px solid var(--border); position:sticky; top:0; background:var(--bg2); z-index:2;
 }
 .modal-head h3{font-size:16.5px; font-weight:800;}
-.modal-close{width:30px; height:30px; border-radius:9px; background:rgba(255,255,255,.05); border:none; color:var(--text-dim); font-size:15px;}
-.modal-close:hover{background:rgba(255,255,255,.1); color:var(--text);}
+.modal-close{width:30px; height:30px; border-radius:9px; background:rgba(178,120,140,.05); border:none; color:var(--text-dim); font-size:15px;}
+.modal-close:hover{background:rgba(178,120,140,.1); color:var(--text);}
 .modal-body{padding:22px;}
 .modal-foot{display:flex; gap:10px; padding:18px 22px; border-top:1px solid var(--border); position:sticky; bottom:0; background:var(--bg2);}
 .modal-foot .btn{flex:1; justify-content:center;}
@@ -228,7 +228,7 @@ input,select,textarea{font-family:inherit;}
 .form-row label{display:block; font-size:12.5px; font-weight:600; color:var(--text-dim); margin-bottom:7px;}
 .form-row input[type=text], .form-row input[type=number], .form-row input[type=datetime-local],
 .form-row select, .form-row textarea{
-  width:100%; background:rgba(255,255,255,.03); border:1px solid var(--border); color:var(--text);
+  width:100%; background:rgba(178,120,140,.03); border:1px solid var(--border); color:var(--text);
   padding:11px 13px; border-radius:11px; font-size:13.5px; transition:.15s;
 }
 .form-row input:focus, .form-row select:focus, .form-row textarea:focus{
@@ -239,14 +239,14 @@ input,select,textarea{font-family:inherit;}
 .axis-select{display:flex; gap:8px;}
 .axis-opt{
   flex:1; text-align:center; padding:12px 8px; border-radius:12px; border:1px solid var(--border);
-  background:rgba(255,255,255,.02); font-size:12.5px; font-weight:700; color:var(--text-dim); transition:.15s;
+  background:rgba(178,120,140,.02); font-size:12.5px; font-weight:700; color:var(--text-dim); transition:.15s;
 }
 .axis-opt .a-ico{display:block; font-size:17px; margin-bottom:5px;}
 .axis-opt.sel[data-axis="Business"]{border-color:var(--axis-business); background:var(--accent-soft); color:var(--text);}
 .axis-opt.sel[data-axis="Health"]{border-color:var(--axis-health); background:var(--success-soft); color:var(--text);}
 .axis-opt.sel[data-axis="Faith"]{border-color:var(--axis-faith); background:var(--warning-soft); color:var(--text);}
 .readonly-field{
-  background:rgba(255,255,255,.02); border:1px dashed var(--border); border-radius:11px; padding:11px 13px;
+  background:rgba(178,120,140,.02); border:1px dashed var(--border); border-radius:11px; padding:11px 13px;
   font-size:13.5px; color:var(--text-dim); display:flex; justify-content:space-between;
 }
 .hint{font-size:11.5px; color:var(--text-faint); margin-top:6px;}
@@ -269,7 +269,7 @@ input,select,textarea{font-family:inherit;}
 .reason-grid{display:grid; grid-template-columns:1fr 1fr; gap:9px; margin-bottom:14px;}
 .reason-opt{
   padding:11px 10px; text-align:center; border-radius:11px; border:1px solid var(--border);
-  background:rgba(255,255,255,.02); font-size:12.5px; font-weight:600; color:var(--text-dim);
+  background:rgba(178,120,140,.02); font-size:12.5px; font-weight:600; color:var(--text-dim);
 }
 .reason-opt.sel{border-color:var(--accent); background:var(--accent-soft); color:var(--text);}
 
@@ -278,22 +278,22 @@ input,select,textarea{font-family:inherit;}
 .eval-q-text{font-size:14.5px; font-weight:700; margin-bottom:12px; text-align:center;}
 .yn-row{display:flex; gap:10px;}
 .yn-btn{
-  flex:1; padding:13px; border-radius:12px; border:1px solid var(--border); background:rgba(255,255,255,.02);
+  flex:1; padding:13px; border-radius:12px; border:1px solid var(--border); background:rgba(178,120,140,.02);
   font-size:14px; font-weight:700; color:var(--text-dim);
 }
-.yn-btn.sel-yes{background:var(--success-soft); border-color:var(--success); color:#6ee7b7;}
-.yn-btn.sel-no{background:var(--danger-soft); border-color:var(--danger); color:#fca5a5;}
+.yn-btn.sel-yes{background:var(--success-soft); border-color:var(--success); color:#2f7a54;}
+.yn-btn.sel-no{background:var(--danger-soft); border-color:var(--danger); color:#b83b48;}
 .slider-wrap{padding:6px 4px;}
 .slider-val{text-align:center; font-size:30px; font-weight:900; color:var(--accent); margin-bottom:8px;}
 input[type=range]{
-  width:100%; height:6px; border-radius:4px; -webkit-appearance:none; background:rgba(255,255,255,.08); outline:none;
+  width:100%; height:6px; border-radius:4px; -webkit-appearance:none; background:rgba(178,120,140,.08); outline:none;
 }
 input[type=range]::-webkit-slider-thumb{
   -webkit-appearance:none; width:22px; height:22px; border-radius:50%; background:var(--accent);
-  box-shadow:0 4px 14px -2px rgba(108,99,255,.7); border:3px solid #fff2; cursor:pointer;
+  box-shadow:0 4px 14px -2px rgba(209,105,155,.55); border:3px solid #fff8; cursor:pointer;
 }
 .task-context-banner{
-  background:rgba(255,255,255,.03); border:1px solid var(--border); border-radius:13px; padding:14px 16px;
+  background:rgba(178,120,140,.03); border:1px solid var(--border); border-radius:13px; padding:14px 16px;
   margin-bottom:20px; text-align:center;
 }
 .task-context-banner .tc-name{font-size:15.5px; font-weight:800; margin-bottom:3px;}
@@ -305,7 +305,7 @@ input[type=range]::-webkit-slider-thumb{
 .axis-bar-row{display:flex; align-items:center; gap:14px; margin-bottom:16px;}
 .axis-bar-label{width:130px; font-size:13px; font-weight:700; display:flex; align-items:center; gap:8px; flex-shrink:0;}
 .axis-bar-label .lbl-dot{width:9px; height:9px; border-radius:50%;}
-.axis-bar-track{flex:1; height:12px; background:rgba(255,255,255,.05); border-radius:8px; overflow:hidden;}
+.axis-bar-track{flex:1; height:12px; background:rgba(178,120,140,.05); border-radius:8px; overflow:hidden;}
 .axis-bar-fill{height:100%; border-radius:8px; transition:width .6s ease;}
 .axis-bar-pct{width:46px; text-align:left; font-size:13px; font-weight:800; flex-shrink:0;}
 .chart-card{background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:20px; height:320px;}
@@ -325,7 +325,7 @@ input[type=range]::-webkit-slider-thumb{
 .fab-add{
   position:fixed; bottom:28px; inset-inline-end:28px; width:58px; height:58px; border-radius:50%;
   background:linear-gradient(135deg, var(--accent), #5750d6); color:#fff; font-size:26px; border:none;
-  box-shadow:0 14px 30px -8px rgba(108,99,255,.65); display:flex; align-items:center; justify-content:center;
+  box-shadow:0 14px 30px -8px rgba(209,105,155,.5); display:flex; align-items:center; justify-content:center;
   z-index:150; display:none;
 }
 .fab-add.show{display:flex;}
@@ -340,12 +340,62 @@ input[type=range]::-webkit-slider-thumb{
 }
 .mobile-menu-btn{display:none; width:40px; height:40px; border-radius:11px; background:var(--card); border:1px solid var(--border); color:var(--text); font-size:17px; align-items:center; justify-content:center;}
 
+/* Floral decorations (light theme) */
+.floral-deco{position:fixed; pointer-events:none; z-index:-1; opacity:.55; width:220px; height:220px;}
+.floral-tl{top:-40px; inset-inline-start:-40px; transform:rotate(-12deg);}
+.floral-br{bottom:-55px; inset-inline-end:-55px; transform:rotate(18deg) scaleX(-1); width:260px; height:260px;}
+@media (max-width:900px){ .floral-deco{width:130px; height:130px;} .floral-br{width:160px; height:160px;} }
+
+/* Settings modal extras */
+.settings-section{margin-bottom:24px;}
+.settings-section-title{font-size:12.5px; font-weight:800; color:var(--text-dim); text-transform:uppercase; letter-spacing:.5px; margin-bottom:12px; display:flex; align-items:center; gap:6px;}
+.toggle-row{display:flex; align-items:center; justify-content:space-between; gap:12px; padding:10px 0;}
+.toggle-row .toggle-label{font-size:13.5px; font-weight:600;}
+.toggle-row .toggle-hint{font-size:11.5px; color:var(--text-faint); margin-top:3px;}
+.switch{position:relative; width:46px; height:26px; flex-shrink:0;}
+.switch input{opacity:0; width:0; height:0;}
+.switch .slider{position:absolute; inset:0; background:var(--border); border-radius:999px; transition:.2s; cursor:pointer;}
+.switch .slider::before{content:''; position:absolute; width:20px; height:20px; left:3px; top:3px; background:#fff; border-radius:50%; transition:.2s; box-shadow:0 2px 5px rgba(0,0,0,.2);}
+.switch input:checked + .slider{background:var(--accent);}
+html[dir="rtl"] .switch .slider::before{left:auto; right:3px;}
+html[dir="rtl"] .switch input:checked + .slider::before{transform:translateX(-20px);}
+.switch input:checked + .slider::before{transform:translateX(20px);}
+.workspace-code-box{display:flex; gap:8px; align-items:center;}
+.workspace-code-box input{flex:1;}
+.reminder-type-row{display:flex; gap:10px; margin-top:6px;}
+.reminder-type-opt{flex:1; text-align:center; padding:11px 8px; border-radius:12px; border:1px solid var(--border); background:rgba(178,120,140,.02); font-size:12.5px; font-weight:700; color:var(--text-dim);}
+.reminder-type-opt .rt-ico{display:block; font-size:16px; margin-bottom:4px;}
+.reminder-type-opt.sel{border-color:var(--accent); background:var(--accent-soft); color:var(--text);}
+
+
 @media (prefers-reduced-motion: reduce){
   *{animation:none !important; transition:none !important;}
 }
 </style>
 </head>
 <body>
+<div class="floral-deco floral-tl" aria-hidden="true">
+  <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><g><circle cx="100" cy="70" r="26" fill="#f3c8da"/>
+      <circle cx="75" cy="95" r="26" fill="#eeb8cf"/>
+      <circle cx="125" cy="95" r="26" fill="#eeb8cf"/>
+      <circle cx="85" cy="120" r="22" fill="#e6a6c2"/>
+      <circle cx="115" cy="120" r="22" fill="#e6a6c2"/>
+      <circle cx="100" cy="100" r="16" fill="#d1699b"/>
+      <path d="M100 140 Q 95 165 100 190" stroke="#8fbf9f" stroke-width="5" fill="none" stroke-linecap="round"/>
+      <path d="M100 160 Q 80 165 72 178" stroke="#8fbf9f" stroke-width="4" fill="none" stroke-linecap="round"/>
+      <path d="M100 150 Q 122 155 130 168" stroke="#8fbf9f" stroke-width="4" fill="none" stroke-linecap="round"/></g></svg>
+</div>
+<div class="floral-deco floral-br" aria-hidden="true">
+  <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><g><circle cx="100" cy="70" r="26" fill="#f3c8da"/>
+      <circle cx="75" cy="95" r="26" fill="#eeb8cf"/>
+      <circle cx="125" cy="95" r="26" fill="#eeb8cf"/>
+      <circle cx="85" cy="120" r="22" fill="#e6a6c2"/>
+      <circle cx="115" cy="120" r="22" fill="#e6a6c2"/>
+      <circle cx="100" cy="100" r="16" fill="#d1699b"/>
+      <path d="M100 140 Q 95 165 100 190" stroke="#8fbf9f" stroke-width="5" fill="none" stroke-linecap="round"/>
+      <path d="M100 160 Q 80 165 72 178" stroke="#8fbf9f" stroke-width="4" fill="none" stroke-linecap="round"/>
+      <path d="M100 150 Q 122 155 130 168" stroke="#8fbf9f" stroke-width="4" fill="none" stroke-linecap="round"/></g></svg>
+</div>
 <div class="app-shell">
 
   <!-- ============================================================
@@ -393,6 +443,7 @@ input[type=range]::-webkit-slider-thumb{
     <div class="sidebar-foot">
       <div class="sync-pill offline" id="syncPill"><span class="led"></span> <span id="syncText">جارِ الاتصال بقاعدة البيانات...</span></div>
       <button class="btn btn-ghost" style="width:100%; justify-content:center;" onclick="openTaskModal()">+ إضافة مهمة جديدة</button>
+      <button class="btn btn-ghost" style="width:100%; justify-content:center;" onclick="openSettingsModal()">⚙️ الإعدادات</button>
     </div>
   </aside>
 
@@ -405,7 +456,7 @@ input[type=range]::-webkit-slider-thumb{
         <button class="mobile-menu-btn" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
         <div>
           <h1 id="pageTitle">نظرة عامة</h1>
-          <div class="date-sub" id="pageDate">—</div>
+          <div class="date-sub"><span id="userGreeting"></span><span id="pageDate">—</span></div>
         </div>
       </div>
       <button class="btn btn-primary" onclick="openTaskModal()">＋ إضافة مهمة</button>
@@ -525,6 +576,15 @@ input[type=range]::-webkit-slider-thumb{
         </select>
       </div>
 
+      <div class="form-row">
+        <label>طريقة التذكير عند بدء المهمة</label>
+        <div class="reminder-type-row" id="reminderTypeSelect">
+          <button type="button" class="reminder-type-opt sel" data-rt="bell" onclick="chooseReminderType('bell')"><span class="rt-ico">🔔</span>رنة جوال</button>
+          <button type="button" class="reminder-type-opt" data-rt="voice" onclick="chooseReminderType('voice')"><span class="rt-ico">🗣️</span>تذكير صوتي</button>
+        </div>
+        <div class="hint">التذكير الصوتي يقول "لديك مهمة الآن" باللغة العربية عند حلول موعد المهمة بالضبط.</div>
+      </div>
+
       <!-- FIELDS HIDDEN FOR HEALTH -->
       <div id="nonHealthFields">
         <div class="divider-label">تفاصيل إضافية</div>
@@ -617,6 +677,85 @@ input[type=range]::-webkit-slider-thumb{
     <div class="modal-foot">
       <button class="btn btn-ghost" onclick="closeModal('bankOverlay')">إلغاء</button>
       <button class="btn btn-primary" onclick="submitBankTask()">حفظ في البنك</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     SETTINGS MODAL
+============================================================ -->
+<div class="overlay" id="settingsOverlay">
+  <div class="modal wide">
+    <div class="modal-head">
+      <h3>⚙️ الإعدادات</h3>
+      <button class="modal-close" onclick="closeModal('settingsOverlay')">✕</button>
+    </div>
+    <div class="modal-body">
+
+      <div class="settings-section">
+        <div class="settings-section-title">👤 الملف الشخصي</div>
+        <div class="form-row">
+          <label>اسمك</label>
+          <input type="text" id="set_userName" placeholder="مثال: سليمان">
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-section-title">💼 ساعات العمل اليومية (خاص بمحور الأعمال فقط)</div>
+        <div class="form-grid">
+          <div class="form-row">
+            <label>الحد الأدنى (ساعات)</label>
+            <input type="number" id="set_workHoursMin" min="1" max="16" step="0.5" value="4">
+          </div>
+          <div class="form-row">
+            <label>الحد الأعلى (ساعات)</label>
+            <input type="number" id="set_workHoursMax" min="1" max="16" step="0.5" value="5">
+          </div>
+        </div>
+        <div class="toggle-row">
+          <div>
+            <div class="toggle-label">تذكير الساعة 8 صباحاً عند نقص ساعات العمل</div>
+            <div class="toggle-hint">يذكّرك النظام يومياً إن كانت مهام الأعمال المجدولة أقل من الحد الأدنى</div>
+          </div>
+          <label class="switch"><input type="checkbox" id="set_morningReminder" checked><span class="slider"></span></label>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-section-title">🔔 الأصوات والتنبيهات</div>
+        <div class="toggle-row">
+          <div>
+            <div class="toggle-label">جرس التذكير بعد انتهاء المهمة بـ10 دقائق</div>
+            <div class="toggle-hint">تنبيه جرس خفيف قبل ظهور نافذة تقييم الالتزام</div>
+          </div>
+          <label class="switch"><input type="checkbox" id="set_postTaskBell" checked><span class="slider"></span></label>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-section-title">🔗 مساحة العمل ومشاركة البيانات</div>
+        <div class="hint" style="margin-bottom:10px;">كل جهاز يفتح التطبيق لأول مرة ينضم تلقائياً لنفس مساحة عملك الحالية (لضمان التزامن بين أجهزتك). إن كان شخص آخر يريد استخدام التطبيق بشكل مستقل تماماً دون مشاركة بياناتك، عليه الضغط على "ابدأ مساحة عمل خاصة بي" من جهازه هو.</div>
+        <div class="form-row">
+          <label>معرّف مساحة عملك الحالية</label>
+          <div class="workspace-code-box">
+            <input type="text" id="set_workspaceId" readonly>
+            <button type="button" class="btn btn-ghost btn-sm" onclick="copyWorkspaceId()">نسخ</button>
+          </div>
+        </div>
+        <div class="form-row">
+          <label>الانضمام إلى مساحة عمل أخرى عبر الرمز</label>
+          <div class="workspace-code-box">
+            <input type="text" id="set_joinWorkspaceId" placeholder="الصق الرمز هنا">
+            <button type="button" class="btn btn-ghost btn-sm" onclick="joinWorkspace()">انضمام</button>
+          </div>
+        </div>
+        <button type="button" class="btn btn-danger btn-sm" style="margin-top:10px;" onclick="startOwnWorkspace()">🔒 ابدأ مساحة عمل خاصة بي (مستقلة تماماً)</button>
+      </div>
+
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal('settingsOverlay')">إغلاق</button>
+      <button class="btn btn-primary" onclick="saveSettings()">حفظ الإعدادات</button>
     </div>
   </div>
 </div>
@@ -779,6 +918,30 @@ try {
   console.error("Supabase init error:", e);
 }
 
+/* ---------- 1b. WORKSPACE (لعزل بيانات مستخدمين مختلفين) ----------
+   أول مرة يفتح فيها أي جهاز التطبيق، ينضم تلقائياً لمساحة العمل الافتراضية
+   (نفس بيانات صاحب الجهاز الأصلي) حتى يبقى التزامن بين أجهزتك يعمل كما هو.
+   أي شخص آخر يريد استخدام التطبيق بمعزل تام عن بياناتك يضغط من جهازه هو
+   على "ابدأ مساحة عمل خاصة بي" من قائمة الإعدادات. ------------------- */
+const DEFAULT_WORKSPACE_ID = "default-owner";
+function loadWorkspaceId() {
+  let id = localStorage.getItem("los_workspace_id");
+  if (!id) { id = DEFAULT_WORKSPACE_ID; localStorage.setItem("los_workspace_id", id); }
+  return id;
+}
+let WORKSPACE_ID = loadWorkspaceId();
+
+/* ---------- 1c. SETTINGS (محلية على كل جهاز) ---------- */
+const DEFAULT_SETTINGS = { userName: "", workHoursMin: 4, workHoursMax: 5, morningReminder: true, postTaskBell: true };
+function loadSettings() {
+  try {
+    const raw = localStorage.getItem("los_settings");
+    return raw ? { ...DEFAULT_SETTINGS, ...JSON.parse(raw) } : { ...DEFAULT_SETTINGS };
+  } catch (e) { return { ...DEFAULT_SETTINGS }; }
+}
+let Settings = loadSettings();
+function persistSettings() { localStorage.setItem("los_settings", JSON.stringify(Settings)); }
+
 /* ---------- 2. GLOBAL STATE ---------- */
 const AppState = {
   tasks: [],            // all tasks fetched from Supabase (or local fallback)
@@ -791,6 +954,8 @@ const AppState = {
   currentDayFilter: "today",
   selectedAxisInForm: "Business",
   selectedBankAxis: "Business",
+  selectedReminderType: "bell",
+  startNotifiedTaskIds: new Set(),   // "task starting now" alerts already fired
   ingredientCounter: 0,
   activeDelayTaskId: null,
   activeEvalTask: null,
@@ -805,7 +970,7 @@ const AppState = {
 };
 
 const AXIS_LABELS = { Business: "الأعمال", Health: "الصحة", Faith: "العبادة" };
-const AXIS_COLORS = { Business: "#6c63ff", Health: "#10b981", Faith: "#f59e0b" };
+const AXIS_COLORS = { Business: "#d1699b", Health: "#4caf7d", Faith: "#d99a3f" };
 const PRIORITY_LABELS = { Max: "أقصى أولوية", Medium: "متوسطة", Normal: "عادية" };
 const LOCATION_LABELS = { External: "خارجي", Office: "المكتب", Remote: "عن بُعد" };
 const MODE_LABELS = { "Deep Focus": "تركيز عميق", "Execution": "تنفيذ", "Communication": "تواصل", "Administrative": "إداري" };
@@ -882,11 +1047,11 @@ async function fetchAllData() {
   }
   try {
     const [tasksRes, dietRes, perfRes, delaysRes, bankRes] = await Promise.all([
-      supabaseClient.from(TABLE_MAP.tasks).select("*").order("start_time", { ascending: true }),
-      supabaseClient.from(TABLE_MAP.diet_items).select("*"),
-      supabaseClient.from(TABLE_MAP.performance_logs).select("*"),
-      supabaseClient.from(TABLE_MAP.delays).select("*"),
-      supabaseClient.from(TABLE_MAP.task_bank).select("*").order("created_at", { ascending: false })
+      supabaseClient.from(TABLE_MAP.tasks).select("*").eq("workspace_id", WORKSPACE_ID).order("start_time", { ascending: true }),
+      supabaseClient.from(TABLE_MAP.diet_items).select("*").eq("workspace_id", WORKSPACE_ID),
+      supabaseClient.from(TABLE_MAP.performance_logs).select("*").eq("workspace_id", WORKSPACE_ID),
+      supabaseClient.from(TABLE_MAP.delays).select("*").eq("workspace_id", WORKSPACE_ID),
+      supabaseClient.from(TABLE_MAP.task_bank).select("*").eq("workspace_id", WORKSPACE_ID).order("created_at", { ascending: false })
     ]);
     if (tasksRes.error) throw tasksRes.error;
     AppState.tasks = tasksRes.data || [];
@@ -912,23 +1077,25 @@ function updateSyncPill(online, text) {
 
 function subscribeRealtime() {
   if (!isSupabaseConfigured) return;
+  const wsFilter = `workspace_id=eq.${WORKSPACE_ID}`;
   supabaseClient
-    .channel("life-os-realtime")
-    .on("postgres_changes", { event: "*", schema: "public", table: TABLE_MAP.tasks }, () => fetchAllData())
-    .on("postgres_changes", { event: "*", schema: "public", table: TABLE_MAP.performance_logs }, () => fetchAllData())
-    .on("postgres_changes", { event: "*", schema: "public", table: TABLE_MAP.delays }, () => fetchAllData())
-    .on("postgres_changes", { event: "*", schema: "public", table: TABLE_MAP.diet_items }, () => fetchAllData())
-    .on("postgres_changes", { event: "*", schema: "public", table: TABLE_MAP.task_bank }, () => fetchAllData())
+    .channel("life-os-realtime-" + WORKSPACE_ID)
+    .on("postgres_changes", { event: "*", schema: "public", table: TABLE_MAP.tasks, filter: wsFilter }, () => fetchAllData())
+    .on("postgres_changes", { event: "*", schema: "public", table: TABLE_MAP.performance_logs, filter: wsFilter }, () => fetchAllData())
+    .on("postgres_changes", { event: "*", schema: "public", table: TABLE_MAP.delays, filter: wsFilter }, () => fetchAllData())
+    .on("postgres_changes", { event: "*", schema: "public", table: TABLE_MAP.diet_items, filter: wsFilter }, () => fetchAllData())
+    .on("postgres_changes", { event: "*", schema: "public", table: TABLE_MAP.task_bank, filter: wsFilter }, () => fetchAllData())
     .subscribe();
 }
 
 async function dbInsert(table, row) {
+  const fullRow = { ...row, workspace_id: WORKSPACE_ID };
   if (!isSupabaseConfigured) {
-    const withId = { ...row, id: uid() };
+    const withId = { ...fullRow, id: uid() };
     AppState[table].push(withId);
     return withId;
   }
-  const { data, error } = await supabaseClient.from(TABLE_MAP[table]).insert(row).select().single();
+  const { data, error } = await supabaseClient.from(TABLE_MAP[table]).insert(fullRow).select().single();
   if (error) { console.error(error); showToast("خطأ", "فشل الحفظ في قاعدة البيانات", "danger"); throw error; }
   return data;
 }
@@ -939,7 +1106,7 @@ async function dbUpdate(table, id, patch) {
     if (idx > -1) AppState[table][idx] = { ...AppState[table][idx], ...patch };
     return;
   }
-  const { error } = await supabaseClient.from(TABLE_MAP[table]).update(patch).eq("id", id);
+  const { error } = await supabaseClient.from(TABLE_MAP[table]).update(patch).eq("id", id).eq("workspace_id", WORKSPACE_ID);
   if (error) { console.error(error); showToast("خطأ", "فشل التحديث", "danger"); throw error; }
 }
 
@@ -948,7 +1115,7 @@ async function dbDelete(table, id) {
     AppState[table] = AppState[table].filter(r => String(r.id) !== String(id));
     return;
   }
-  const { error } = await supabaseClient.from(TABLE_MAP[table]).delete().eq("id", id);
+  const { error } = await supabaseClient.from(TABLE_MAP[table]).delete().eq("id", id).eq("workspace_id", WORKSPACE_ID);
   if (error) { console.error(error); showToast("خطأ", "فشل الحذف", "danger"); throw error; }
 }
 
@@ -1038,6 +1205,7 @@ function taskCardHTML(t) {
     metaBits += `<span>🧠 ${MODE_LABELS[t.mental_mode] || t.mental_mode || "—"}</span>`;
   }
   metaBits += `<span>🔁 ${RECURRENCE_LABELS[t.recurrence] || t.recurrence}</span>`;
+  metaBits += `<span>${(t.reminder_type === "voice") ? "🗣️ تذكير صوتي" : "🔔 تذكير جرس"}</span>`;
   if (t.delay_count) metaBits += `<span>⏳ تأجيل ${t.delay_count}/3</span>`;
 
   const priorityBadge = t.priority ? `<span class="badge badge-priority-${t.priority}">${PRIORITY_LABELS[t.priority] || t.priority}</span>` : "";
@@ -1224,6 +1392,60 @@ async function moveTaskToBank(t) {
   fetchAllData();
 }
 
+/* ---------- 6c. SETTINGS / WORKSPACE UI ---------- */
+function openSettingsModal() {
+  document.getElementById("set_userName").value = Settings.userName || "";
+  document.getElementById("set_workHoursMin").value = Settings.workHoursMin;
+  document.getElementById("set_workHoursMax").value = Settings.workHoursMax;
+  document.getElementById("set_morningReminder").checked = !!Settings.morningReminder;
+  document.getElementById("set_postTaskBell").checked = !!Settings.postTaskBell;
+  document.getElementById("set_workspaceId").value = WORKSPACE_ID;
+  document.getElementById("set_joinWorkspaceId").value = "";
+  openModal("settingsOverlay");
+}
+
+function saveSettings() {
+  Settings.userName = document.getElementById("set_userName").value.trim();
+  Settings.workHoursMin = parseFloat(document.getElementById("set_workHoursMin").value || "4");
+  Settings.workHoursMax = parseFloat(document.getElementById("set_workHoursMax").value || "5");
+  Settings.morningReminder = document.getElementById("set_morningReminder").checked;
+  Settings.postTaskBell = document.getElementById("set_postTaskBell").checked;
+  persistSettings();
+  applyUserGreeting();
+  showToast("تم الحفظ", "تم تحديث الإعدادات بنجاح", "success");
+  closeModal("settingsOverlay");
+}
+
+function applyUserGreeting() {
+  const el = document.getElementById("userGreeting");
+  if (el) el.textContent = Settings.userName ? `أهلاً ${Settings.userName} — ` : "";
+}
+
+function copyWorkspaceId() {
+  const input = document.getElementById("set_workspaceId");
+  input.select();
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(WORKSPACE_ID).catch(() => {});
+  }
+  try { document.execCommand("copy"); } catch (e) {}
+  showToast("تم النسخ", "تم نسخ معرّف مساحة العمل، شاركه مع جهازك الآخر لربطهما", "success");
+}
+
+function joinWorkspace() {
+  const code = document.getElementById("set_joinWorkspaceId").value.trim();
+  if (!code) { showToast("بيانات ناقصة", "يرجى لصق رمز مساحة العمل أولاً", "danger"); return; }
+  if (!confirm("سيتم تبديل مساحة العمل الحالية إلى الرمز المُدخل، وستظهر بيانات تلك المساحة بدل بياناتك الحالية على هذا الجهاز. هل تريد المتابعة؟")) return;
+  localStorage.setItem("los_workspace_id", code);
+  location.reload();
+}
+
+function startOwnWorkspace() {
+  if (!confirm("سيتم إنشاء مساحة عمل جديدة مستقلة تماماً خاصة بهذا الجهاز، ولن تظهر بيانات مساحة العمل الحالية بعد الآن على هذا الجهاز فقط. هل تريد المتابعة؟")) return;
+  const newId = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : ("ws-" + Date.now() + "-" + Math.random().toString(36).slice(2));
+  localStorage.setItem("los_workspace_id", newId);
+  location.reload();
+}
+
 /* ---------- 7. TASK FORM: OPEN / AXIS SWITCH / INGREDIENTS ---------- */
 function openTaskModal(taskId) {
   document.getElementById("taskModalTitle").textContent = taskId ? "تعديل المهمة" : "إضافة مهمة جديدة";
@@ -1246,8 +1468,14 @@ function openTaskModal(taskId) {
   addIngredientRow();
 
   chooseAxis("Business");
+  chooseReminderType("bell");
   recalcEndTime();
   openModal("taskOverlay");
+}
+
+function chooseReminderType(type) {
+  AppState.selectedReminderType = type;
+  document.querySelectorAll("#reminderTypeSelect .reminder-type-opt").forEach(el => el.classList.toggle("sel", el.dataset.rt === type));
 }
 
 function chooseAxis(axis) {
@@ -1361,7 +1589,8 @@ async function submitTask() {
     location: axis === "Health" ? null : document.getElementById("f_location").value,
     mental_mode: axis === "Health" ? null : document.getElementById("f_mode").value,
     notes: document.getElementById("f_notes").value.trim(),
-    status: "pending"
+    status: "pending",
+    reminder_type: AppState.selectedReminderType
   };
   if (!editingId) payload.delay_count = 0;
 
@@ -1405,6 +1634,7 @@ function editTask(id) {
   document.getElementById("f_duration").value = t.duration;
   document.getElementById("f_recurrence").value = t.recurrence || "Once";
   document.getElementById("f_notes").value = t.notes || "";
+  chooseReminderType(t.reminder_type || "bell");
 
   if (t.axis_type === "Health") {
     document.getElementById("f_mealtype").value = t.name;
@@ -1528,7 +1758,7 @@ function setEvalGramsCommit(val) {
 }
 
 function openEvaluationModal(task) {
-  playBellSound();
+  if (Settings.postTaskBell) playBellSound();
 
   AppState.activeEvalTask = task;
   AppState.evalCommit = null;
@@ -1634,12 +1864,33 @@ function scanUpcomingReminders() {
     if (t.status === "delayed") return;
     const startMs = new Date(t.start_time).getTime();
     const diffMin = (startMs - now) / 60000;
-    // fire once when the task is between 9.5 and 10.5 minutes away
-    if (diffMin <= 10.5 && diffMin >= 9.5 && !AppState.notifiedTaskIds.has(String(t.id))) {
+    // نافذة أوسع (8 إلى 11 دقيقة) لتقليل احتمال تفويت التنبيه بسبب تجميد المتصفح بالخلفية
+    if (diffMin <= 11 && diffMin >= 8 && !AppState.notifiedTaskIds.has(String(t.id))) {
       AppState.notifiedTaskIds.add(String(t.id));
       const phrase = `تنبيه: متبقي عشر دقائق على موعد ${t.name}`;
       speakArabic(phrase); // صوت بشري حصراً لهذا التذكير
       showToast("🔔 تذكير قادم", phrase, "warning");
+    }
+  });
+}
+
+/* ---------- 12b. "لديك مهمة الآن" (عند حلول موعد المهمة بالضبط) ---------- */
+function scanTaskStartReminders() {
+  const now = Date.now();
+  AppState.tasks.forEach(t => {
+    if (t.status === "delayed") return;
+    const startMs = new Date(t.start_time).getTime();
+    const diffMin = (now - startMs) / 60000;
+    // نافذة من لحظة البدء وحتى دقيقتين بعدها، مرة واحدة فقط لكل مهمة
+    if (diffMin >= 0 && diffMin <= 2 && !AppState.startNotifiedTaskIds.has(String(t.id))) {
+      AppState.startNotifiedTaskIds.add(String(t.id));
+      const method = t.reminder_type || "bell";
+      if (method === "voice") {
+        speakArabic("لديك مهمة الآن");
+      } else {
+        playBellSound();
+      }
+      showToast("⏰ حان الوقت", `حان الآن موعد "${t.name}"`, "warning");
     }
   });
 }
@@ -1661,6 +1912,26 @@ function scanPendingEvaluations() {
     }
   });
   processEvalQueue();
+}
+
+/* ---------- 13b. تذكير الساعة 8 صباحاً عند نقص ساعات العمل (محور الأعمال فقط) ---------- */
+function scanMorningBusinessReminder() {
+  if (!Settings.morningReminder) return;
+  const now = new Date();
+  if (now.getHours() !== 8) return; // فقط خلال الساعة 8 صباحاً
+  const todayKey = now.toISOString().slice(0, 10);
+  if (localStorage.getItem("los_morning_reminder_date") === todayKey) return; // أُرسل اليوم بالفعل
+
+  const businessMinutesToday = AppState.tasks
+    .filter(t => t.axis_type === "Business" && isSameDay(t.start_time, now))
+    .reduce((sum, t) => sum + (t.duration || 0), 0);
+  const businessHoursToday = businessMinutesToday / 60;
+
+  if (businessHoursToday < Settings.workHoursMin) {
+    localStorage.setItem("los_morning_reminder_date", todayKey);
+    playBellSound();
+    showToast("☀️ صباح الخير", `مهام أعمالك اليوم حالياً ${businessHoursToday.toFixed(1)} ساعة فقط، أمامك متسع من الوقت لإنجاز المزيد.`, "warning");
+  }
 }
 
 /* ---------- 14. REPORTS & ANALYTICS ---------- */
@@ -1725,30 +1996,44 @@ function renderWeeklyChart() {
     data: {
       labels,
       datasets: [
-        { label: "التزام", data: committedData, backgroundColor: "#10b981", borderRadius: 6 },
-        { label: "تأجيل", data: delayedData, backgroundColor: "#f59e0b", borderRadius: 6 },
-        { label: "عدم التزام", data: notCommittedData, backgroundColor: "#ef4444", borderRadius: 6 }
+        { label: "التزام", data: committedData, backgroundColor: "#4caf7d", borderRadius: 6 },
+        { label: "تأجيل", data: delayedData, backgroundColor: "#d99a3f", borderRadius: 6 },
+        { label: "عدم التزام", data: notCommittedData, backgroundColor: "#e0616f", borderRadius: 6 }
       ]
     },
     options: {
       responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { labels: { color: "#f5f5fa", font: { family: "Tajawal" } } } },
+      plugins: { legend: { labels: { color: "#4a3b3f", font: { family: "Tajawal" } } } },
       scales: {
-        x: { ticks: { color: "#9a9ab0", font: { family: "Tajawal" } }, grid: { color: "rgba(255,255,255,.05)" } },
-        y: { ticks: { color: "#9a9ab0", stepSize: 1 }, grid: { color: "rgba(255,255,255,.05)" }, beginAtZero: true }
+        x: { ticks: { color: "#8a7680", font: { family: "Tajawal" } }, grid: { color: "rgba(178,120,140,.08)" } },
+        y: { ticks: { color: "#8a7680", stepSize: 1 }, grid: { color: "rgba(178,120,140,.08)" }, beginAtZero: true }
       }
     }
   });
 }
 
 /* ---------- 15. INIT ---------- */
+function runAllReminderScans() {
+  scanUpcomingReminders();
+  scanTaskStartReminders();
+  scanPendingEvaluations();
+  scanMorningBusinessReminder();
+}
+
 function initApp() {
   document.getElementById("pageDate").textContent = formatDateLabel(new Date());
+  applyUserGreeting();
   fetchAllData();
   subscribeRealtime();
 
-  setInterval(scanUpcomingReminders, 30000);
-  setInterval(scanPendingEvaluations, 30000);
+  // فحص كل 15 ثانية بدل 30 لتقليل احتمال تفويت التنبيهات
+  setInterval(runAllReminderScans, 15000);
+  // فحص فوري كلما رجع المستخدم للتبويب (لأن المتصفحات تجمّد المؤقتات بالخلفية)
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") runAllReminderScans();
+  });
+  // فحص فوري عند فتح التطبيق أول مرة
+  setTimeout(runAllReminderScans, 2000);
 
   window.addEventListener("click", (e) => {
     document.querySelectorAll(".overlay.show").forEach(ov => {
