@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -14,23 +15,23 @@
    TOKENS — Luxury Dark Slate
 ============================================================ */
 :root{
-  --bg:#fdf3ee; --bg2:#fff5f8; --card:#ffffff; --accent:#d1699b;
+  --bg:#f2f2f4; --bg2:#fafafb; --card:#ffffff; --accent:#d1699b;
   --accent-soft: rgba(209,105,155,.14);
   --success:#4caf7d; --success-soft: rgba(76,175,125,.14);
   --warning:#d99a3f; --warning-soft: rgba(217,154,63,.14);
   --danger:#e0616f; --danger-soft: rgba(224,97,111,.14);
-  --text:#4a3b3f; --text-dim:#8a7680; --text-faint:#c9b8bf;
-  --border:#f0d9e0;
+  --text:#403d40; --text-dim:#847f85; --text-faint:#c3bfc4;
+  --border:#e5e3e6;
   --radius:18px; --radius-sm:12px;
-  --shadow: 0 20px 50px -28px rgba(178,120,140,.35);
+  --shadow: 0 20px 50px -28px rgba(70,65,72,.22);
   --axis-business:#d1699b; --axis-health:#4caf7d; --axis-faith:#d99a3f;
 }
 *{box-sizing:border-box; margin:0; padding:0;}
 html,body{height:100%;}
 body{
   background:
-    radial-gradient(1200px 600px at 85% -10%, rgba(209,105,155,.12), transparent 60%),
-    radial-gradient(900px 500px at -10% 110%, rgba(76,175,125,.10), transparent 60%),
+    radial-gradient(1200px 600px at 85% -10%, rgba(209,105,155,.06), transparent 60%),
+    radial-gradient(900px 500px at -10% 110%, rgba(76,175,125,.05), transparent 60%),
     var(--bg);
   color:var(--text);
   font-family:'Tajawal', sans-serif;
@@ -201,11 +202,11 @@ input,select,textarea{font-family:inherit;}
    MODALS
 ============================================================ */
 .overlay{
-  position:fixed; inset:0; background:rgba(74,59,63,.45); backdrop-filter:blur(6px);
+  position:fixed; inset:0; background:rgba(60,58,62,.45); backdrop-filter:blur(6px);
   display:none; align-items:center; justify-content:center; z-index:200; padding:20px;
 }
 .overlay.show{display:flex;}
-.overlay.locked{background:rgba(74,59,63,.6);}
+.overlay.locked{background:rgba(60,58,62,.6);}
 .modal{
   background:var(--bg2); border:1px solid var(--border); border-radius:20px;
   width:100%; max-width:520px; max-height:88vh; overflow-y:auto; box-shadow:var(--shadow);
@@ -730,6 +731,20 @@ html[dir="rtl"] .switch input:checked + .slider::before{transform:translateX(-20
           </div>
           <label class="switch"><input type="checkbox" id="set_postTaskBell" checked><span class="slider"></span></label>
         </div>
+        <div class="hint" style="margin-bottom:8px;">إن لم تسمع صوتاً عند التنبيهات، اضغط الأزرار التالية أولاً (متصفحات الجوال تمنع تشغيل أي صوت قبل تفاعلك المباشر مع الصفحة):</div>
+        <div style="display:flex; gap:8px;">
+          <button type="button" class="btn btn-ghost btn-sm" style="flex:1;" onclick="unlockAudioOnce(); playBellSound();">🔔 اختبار الجرس</button>
+          <button type="button" class="btn btn-ghost btn-sm" style="flex:1;" onclick="unlockAudioOnce(); speakArabic('هذا اختبار للتذكير الصوتي');">🗣️ اختبار الصوت</button>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-section-title">📲 التنبيهات حتى لو التطبيق مغلق</div>
+        <div class="hint" style="margin-bottom:10px;">فعّلها لتصلك تذكيراتك حتى لو أغلقت المتصفح تماماً أو كان الجوال مقفلاً. تحتاج الموافقة على إذن الإشعارات مرة واحدة فقط.</div>
+        <div class="toggle-row" style="padding-top:0;">
+          <div class="toggle-label" id="pushStatusText">جارِ التحقق...</div>
+          <button type="button" class="btn btn-primary btn-sm" onclick="enablePushNotifications()">تفعيل الآن</button>
+        </div>
       </div>
 
       <div class="settings-section">
@@ -873,8 +888,10 @@ html[dir="rtl"] .switch input:checked + .slider::before{transform:translateX(-20
         </div>
       </div>
     </div>
-    <div class="modal-foot">
-      <button class="btn btn-primary" style="width:100%;" onclick="submitEvaluation()">حفظ التقييم</button>
+    <div class="modal-foot" style="flex-wrap:wrap;">
+      <button class="btn btn-ghost" style="flex:1 1 47%;" onclick="delayFromEval()">⏳ تأجيل المهمة</button>
+      <button class="btn btn-ghost" style="flex:1 1 47%;" onclick="sendEvalTaskToBank()">📚 إعادة لبنك المهام</button>
+      <button class="btn btn-primary" style="flex:1 1 100%;" onclick="submitEvaluation()">✅ حفظ التقييم</button>
     </div>
   </div>
 </div>
@@ -903,7 +920,9 @@ const TABLE_MAP = {
   diet_items: "los_diet_items",
   performance_logs: "los_performance_logs",
   delays: "los_delays",
-  task_bank: "los_task_bank"
+  task_bank: "los_task_bank",
+  push_subscriptions: "los_push_subscriptions",
+  workspace_settings: "los_workspace_settings"
 };
 
 let supabaseClient = null;
@@ -932,7 +951,7 @@ function loadWorkspaceId() {
 let WORKSPACE_ID = loadWorkspaceId();
 
 /* ---------- 1c. SETTINGS (محلية على كل جهاز) ---------- */
-const DEFAULT_SETTINGS = { userName: "", workHoursMin: 4, workHoursMax: 5, morningReminder: true, postTaskBell: true };
+const DEFAULT_SETTINGS = { userName: "", workHoursMin: 4, workHoursMax: 5, morningReminder: true, postTaskBell: true, pushEnabled: false };
 function loadSettings() {
   try {
     const raw = localStorage.getItem("los_settings");
@@ -1016,12 +1035,41 @@ function openModal(id) { document.getElementById(id).classList.add("show"); }
 function closeModal(id) { document.getElementById(id).classList.remove("show"); }
 
 /* ---------- 3b. SOUND ALERTS ----------
-   صوت بشري (تحويل نص لكلام): يُستخدم حصراً لتنبيه العشر دقائق قبل موعد المهمة.
-   جرس تنبيه: يُستخدم لكل التنبيهات الأخرى (رسالة تقييم، نقل تلقائي لبنك المهام...).
+   صوت بشري (تحويل نص لكلام): يُستخدم حصراً لتنبيه العشر دقائق قبل موعد المهمة،
+   ولتذكير "لديك مهمة الآن" إن اختار المستخدم النوع الصوتي لتلك المهمة.
+   جرس تنبيه: يُستخدم لبقية التنبيهات (رسالة تقييم، تذكير الصباح، نقل لبنك المهام...).
+
+   ملاحظة مهمة: كل المتصفحات تمنع تشغيل أي صوت تلقائياً قبل أول تفاعل حقيقي
+   من المستخدم مع الصفحة (سياسة Autoplay). لهذا نستخدم مستمعاً لأول ضغطة/لمسة
+   لفتح قناة الصوت، ونعيد استخدام نفس سياق الصوت بدل إنشاء واحد جديد كل مرة.
 ------------------------------------------------- */
+let sharedAudioCtx = null;
+function getAudioCtx() {
+  if (!sharedAudioCtx) {
+    try { sharedAudioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+    catch (e) { console.warn("AudioContext unavailable:", e); return null; }
+  }
+  if (sharedAudioCtx.state === "suspended") { sharedAudioCtx.resume().catch(() => {}); }
+  return sharedAudioCtx;
+}
+function unlockAudioOnce() {
+  getAudioCtx();
+  if ("speechSynthesis" in window) {
+    try {
+      const u = new SpeechSynthesisUtterance(" ");
+      u.volume = 0;
+      window.speechSynthesis.speak(u);
+    } catch (e) {}
+  }
+}
+["click", "touchstart", "keydown"].forEach(evt => {
+  document.addEventListener(evt, unlockAudioOnce, { once: true, passive: true });
+});
+
 function playBellSound() {
   try {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const ctx = getAudioCtx();
+    if (!ctx) return;
     const now = ctx.currentTime;
     [880, 1320].forEach((freq, i) => {
       const osc = ctx.createOscillator();
@@ -1401,6 +1449,7 @@ function openSettingsModal() {
   document.getElementById("set_postTaskBell").checked = !!Settings.postTaskBell;
   document.getElementById("set_workspaceId").value = WORKSPACE_ID;
   document.getElementById("set_joinWorkspaceId").value = "";
+  refreshPushStatusUI();
   openModal("settingsOverlay");
 }
 
@@ -1412,6 +1461,7 @@ function saveSettings() {
   Settings.postTaskBell = document.getElementById("set_postTaskBell").checked;
   persistSettings();
   applyUserGreeting();
+  syncWorkspaceSettingsToServer();
   showToast("تم الحفظ", "تم تحديث الإعدادات بنجاح", "success");
   closeModal("settingsOverlay");
 }
@@ -1444,6 +1494,90 @@ function startOwnWorkspace() {
   const newId = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : ("ws-" + Date.now() + "-" + Math.random().toString(36).slice(2));
   localStorage.setItem("los_workspace_id", newId);
   location.reload();
+}
+
+/* ---------- 6d. PUSH NOTIFICATIONS (تعمل حتى لو التطبيق مغلق) ---------- */
+const VAPID_PUBLIC_KEY = "BB9z5Hf96TsMpthuPiIXEJWO6iErx96SSHlFSs5-K1EfkT39WIZiwpIpR2IQJ0RCRMcOczE3v8x1_dR5bPq2mDA";
+
+function urlBase64ToUint8Array(base64String) {
+  const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
+  const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
+  const rawData = atob(base64);
+  const outputArray = new Uint8Array(rawData.length);
+  for (let i = 0; i < rawData.length; i++) outputArray[i] = rawData.charCodeAt(i);
+  return outputArray;
+}
+
+async function syncWorkspaceSettingsToServer() {
+  if (!isSupabaseConfigured) return;
+  try {
+    await supabaseClient.from(TABLE_MAP.workspace_settings).upsert({
+      workspace_id: WORKSPACE_ID,
+      user_name: Settings.userName || null,
+      work_hours_min: Settings.workHoursMin,
+      work_hours_max: Settings.workHoursMax,
+      morning_reminder: Settings.morningReminder,
+      post_task_bell: Settings.postTaskBell,
+      push_enabled: !!Settings.pushEnabled,
+      updated_at: new Date().toISOString()
+    }, { onConflict: "workspace_id" });
+  } catch (e) { console.error("workspace settings sync error:", e); }
+}
+
+function refreshPushStatusUI() {
+  const el = document.getElementById("pushStatusText");
+  if (!el) return;
+  if (!("serviceWorker" in navigator) || !("PushManager" in window)) {
+    el.textContent = "❌ متصفحك الحالي لا يدعم إشعارات الدفع";
+  } else if (Settings.pushEnabled) {
+    el.textContent = "✅ إشعارات الدفع مفعّلة على هذا الجهاز";
+  } else {
+    el.textContent = "⭕ غير مفعّلة بعد على هذا الجهاز";
+  }
+}
+
+async function enablePushNotifications() {
+  if (!("serviceWorker" in navigator) || !("PushManager" in window)) {
+    showToast("غير مدعوم", "متصفحك الحالي لا يدعم إشعارات الدفع", "danger");
+    return;
+  }
+  if (!isSupabaseConfigured) {
+    showToast("غير متاح", "يلزم الاتصال بـ Supabase أولاً لتفعيل هذه الميزة", "danger");
+    return;
+  }
+  try {
+    unlockAudioOnce();
+    const permission = await Notification.requestPermission();
+    if (permission !== "granted") {
+      showToast("لم يتم التفعيل", "يجب الموافقة على إذن الإشعارات من إعدادات المتصفح لتعمل هذه الميزة", "danger");
+      return;
+    }
+    const reg = await navigator.serviceWorker.register("sw.js");
+    await navigator.serviceWorker.ready;
+    let sub = await reg.pushManager.getSubscription();
+    if (!sub) {
+      sub = await reg.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
+      });
+    }
+    const subJson = sub.toJSON();
+    await supabaseClient.from(TABLE_MAP.push_subscriptions).upsert({
+      workspace_id: WORKSPACE_ID,
+      endpoint: subJson.endpoint,
+      p256dh: subJson.keys.p256dh,
+      auth: subJson.keys.auth
+    }, { onConflict: "endpoint" });
+
+    Settings.pushEnabled = true;
+    persistSettings();
+    await syncWorkspaceSettingsToServer();
+    refreshPushStatusUI();
+    showToast("تم التفعيل 🎉", "ستصلك التنبيهات من الآن حتى لو كان التطبيق مغلقاً أو الجوال مقفلاً", "success");
+  } catch (e) {
+    console.error(e);
+    showToast("خطأ", "تعذّر تفعيل التنبيهات — تأكد أن الموقع يُفتح عبر رابط https", "danger");
+  }
 }
 
 /* ---------- 7. TASK FORM: OPEN / AXIS SWITCH / INGREDIENTS ---------- */
@@ -1702,6 +1836,7 @@ async function submitDelay() {
   if (currentDelayCount >= 3) {
     await moveTaskToBank(t);
     closeModal("delayOverlay");
+    processEvalQueue();
     return;
   }
 
@@ -1737,6 +1872,7 @@ async function submitDelay() {
   AppState.notifiedTaskIds.delete(String(t.id));
   showToast("تم التأجيل", `تم تحديث موعد المهمة (تأجيل رقم ${newDelayCount} من 3 قبل نقلها تلقائياً لبنك المهام)`, "success");
   closeModal("delayOverlay");
+  processEvalQueue();
   fetchAllData();
 }
 
@@ -1755,6 +1891,24 @@ function setEvalGramsCommit(val) {
   AppState.evalGramsCommit = val;
   document.getElementById("evalGramsYesBtn").classList.toggle("sel-yes", val === true);
   document.getElementById("evalGramsNoBtn").classList.toggle("sel-no", val === false);
+}
+
+function delayFromEval() {
+  const task = AppState.activeEvalTask;
+  if (!task) return;
+  closeModal("evalOverlay");
+  AppState.activeEvalTask = null;
+  openDelayModal(task.id);
+}
+
+async function sendEvalTaskToBank() {
+  const task = AppState.activeEvalTask;
+  if (!task) return;
+  if (!confirm(`هل تريد إعادة مهمة "${task.name}" إلى بنك المهام بدل تقييمها الآن؟`)) return;
+  closeModal("evalOverlay");
+  AppState.activeEvalTask = null;
+  await moveTaskToBank(task);
+  processEvalQueue();
 }
 
 function openEvaluationModal(task) {
@@ -1977,15 +2131,18 @@ function renderWeeklyChart() {
   const committedData = [];
   const delayedData = [];
   const notCommittedData = [];
+  const bankedData = [];
 
   days.forEach(day => {
     const dayLogs = AppState.performance_logs.filter(l => isSameDay(l.logged_at, day));
     const committed = dayLogs.filter(l => l.is_committed === true).length;
     const notCommitted = dayLogs.filter(l => l.is_committed === false).length;
     const dayDelays = AppState.delays.filter(d => isSameDay(d.new_time, day)).length;
+    const dayBanked = AppState.task_bank.filter(b => isSameDay(b.created_at, day)).length;
     committedData.push(committed);
     notCommittedData.push(notCommitted);
     delayedData.push(dayDelays);
+    bankedData.push(dayBanked);
   });
 
   const ctx = document.getElementById("weeklyChart").getContext("2d");
@@ -1998,15 +2155,16 @@ function renderWeeklyChart() {
       datasets: [
         { label: "التزام", data: committedData, backgroundColor: "#4caf7d", borderRadius: 6 },
         { label: "تأجيل", data: delayedData, backgroundColor: "#d99a3f", borderRadius: 6 },
-        { label: "عدم التزام", data: notCommittedData, backgroundColor: "#e0616f", borderRadius: 6 }
+        { label: "عدم التزام", data: notCommittedData, backgroundColor: "#e0616f", borderRadius: 6 },
+        { label: "أُضيفت لبنك المهام", data: bankedData, backgroundColor: "#a97cb8", borderRadius: 6 }
       ]
     },
     options: {
       responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { labels: { color: "#4a3b3f", font: { family: "Tajawal" } } } },
+      plugins: { legend: { labels: { color: "#403d40", font: { family: "Tajawal" } } } },
       scales: {
-        x: { ticks: { color: "#8a7680", font: { family: "Tajawal" } }, grid: { color: "rgba(178,120,140,.08)" } },
-        y: { ticks: { color: "#8a7680", stepSize: 1 }, grid: { color: "rgba(178,120,140,.08)" }, beginAtZero: true }
+        x: { ticks: { color: "#847f85", font: { family: "Tajawal" } }, grid: { color: "rgba(178,120,140,.08)" } },
+        y: { ticks: { color: "#847f85", stepSize: 1 }, grid: { color: "rgba(178,120,140,.08)" }, beginAtZero: true }
       }
     }
   });
@@ -2025,6 +2183,7 @@ function initApp() {
   applyUserGreeting();
   fetchAllData();
   subscribeRealtime();
+  syncWorkspaceSettingsToServer();
 
   // فحص كل 15 ثانية بدل 30 لتقليل احتمال تفويت التنبيهات
   setInterval(runAllReminderScans, 15000);
@@ -2047,3 +2206,5 @@ document.addEventListener("DOMContentLoaded", initApp);
 </script>
 </body>
 </html>
+
+```
